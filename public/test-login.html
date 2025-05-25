@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Test</title>
+</head>
+<body>
+    <h1>Login Test</h1>
+    <button onclick="testLogin()">Test Login with ianmalcolm</button>
+    <div id="result"></div>
+
+    <script>
+        async function testLogin() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                console.log('Starting login test...');
+                
+                const response = await fetch('http://localhost:8080/admin/login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ login_name: 'ianmalcolm' })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<p style="color: green;">Success: ${JSON.stringify(data)}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                console.error('Login test failed:', error);
+                resultDiv.innerHTML = `<p style="color: red;">Network Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

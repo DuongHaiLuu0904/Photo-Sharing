@@ -1,0 +1,47 @@
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const path = require("path");
+const session = require("express-session");
+const dbConnect = require("./Back/config/Connect");
+
+const UserRouter = require("./Back/routes/user.route");
+const PhotoRouter = require("./Back/routes/photo.route");
+
+dbConnect();
+
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
+
+app.use(express.json());
+
+// Session configuration
+app.use(session({
+  secret: 'photo-sharing-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    secure: false, // Set to true in production with HTTPS
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
+
+
+// Admin routes (login/logout) - no auth required
+app.use("/admin", require("./Back/routes/admin.route"));
+
+app.use("/user", UserRouter);
+app.use("/photo", PhotoRouter);
+
+app.get("/", (request, response) => {
+  response.send({ message: "Hello from photo-sharing app API!" });
+});
+
+app.listen(8080, () => {
+  console.log("server listening on port 8080");
+});
