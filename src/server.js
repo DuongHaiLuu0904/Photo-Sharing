@@ -1,12 +1,15 @@
 const express = require("express");
 const app = express();
+
 const cors = require("cors");
 const path = require("path");
 const session = require("express-session");
+
 const dbConnect = require("./Back/config/Connect");
 
 const UserRouter = require("./Back/routes/user.route");
 const PhotoRouter = require("./Back/routes/photo.route");
+const AdminRouter = require("./Back/routes/admin.route");
 
 dbConnect();
 
@@ -23,7 +26,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: { 
-    secure: false, // Set to true in production with HTTPS
+    secure: false, 
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
@@ -31,9 +34,7 @@ app.use(session({
 
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
-
-// Admin routes (login/logout) - no auth required
-app.use("/admin", require("./Back/routes/admin.route"));
+app.use("/admin", AdminRouter);
 
 app.use("/user", UserRouter);
 app.use("/photo", PhotoRouter);
