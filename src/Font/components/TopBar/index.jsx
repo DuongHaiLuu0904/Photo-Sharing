@@ -144,7 +144,7 @@ function TopBar() {
                 }}
               />
             }
-            label="Enable Advanced Features"
+            label="Advanced Features"
             sx={{
               color: 'white',
               marginRight: 2

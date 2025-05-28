@@ -24,7 +24,7 @@ const App = (props) => {
             <div className="main-topbar-buffer" />
             <Grid item sm={3}>
               <Paper className="main-grid-item">
-                <ProtectedRoute>
+                <ProtectedRoute hideOnLogin={true}>
                   <UserList />
                 </ProtectedRoute>
               </Paper>

@@ -419,7 +419,7 @@ function UserPhotos () {
                             mr: 1,
                             fontSize: '0.8rem'
                           }}>
-                            {comment.user.first_name[0]}{comment.user.last_name[0]}
+                            {comment.user.first_name}{comment.user.last_name}
                           </Avatar>
                           <Box sx={{ flexGrow: 1 }}>
                             <Typography 

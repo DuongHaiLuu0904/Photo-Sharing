@@ -25,17 +25,18 @@ function UserComments() {
   const { setCurrentContext, advancedFeaturesEnabled } = useAppContext();
   const [user, setUser] = useState(null);
   const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadUserComments = async () => {
       try {
         setLoading(true);
-        
+
         // Load user data
         const userData = await fetchModel(`/user/${userId}`);
         setUser(userData);
-        
+
         if (userData) {
           setCurrentContext(`Comments by ${userData.first_name} ${userData.last_name}`);
         }
@@ -75,7 +76,7 @@ function UserComments() {
         // Sort comments by date (newest first)
         allComments.sort((a, b) => new Date(b.date_time) - new Date(a.date_time));
         setComments(allComments);
-        
+
         setError(null);
       } catch (err) {
         setError('Failed to load user comments');
@@ -147,7 +148,7 @@ function UserComments() {
       <Typography variant="h5" gutterBottom>
         Comments by {user.first_name} {user.last_name}
       </Typography>
-      
+
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Total comments: {comments.length}
       </Typography>
@@ -158,13 +159,15 @@ function UserComments() {
             <Grid container spacing={2}>
               {/* Photo thumbnail */}
               <Grid item xs={12} sm={3}>
-                <Link 
+                <Link
                   to={getPhotoViewLink(comment.photo)}
-                  style={{ textDecoration: 'none' }}                >                  <CardMedia
+                  style={{ textDecoration: 'none' }}                
+                >                  
+                  <CardMedia
                     component="img"
                     image={comment.photo.file_name}
                     alt="Photo thumbnail"
-                    sx={{ 
+                    sx={{
                       height: 120,
                       objectFit: 'cover',
                       borderRadius: 1,
@@ -183,9 +186,9 @@ function UserComments() {
               <Grid item xs={12} sm={9}>
                 <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Avatar sx={{ 
-                      width: 24, 
-                      height: 24, 
+                    <Avatar sx={{
+                      width: 24,
+                      height: 24,
                       mr: 1,
                       fontSize: '0.7rem'
                     }}>
@@ -194,21 +197,21 @@ function UserComments() {
                     <Typography variant="subtitle2" sx={{ mr: 2 }}>
                       {user.first_name} {user.last_name}
                     </Typography>
-                    <Chip 
+                    <Chip
                       label={formatDateTime(comment.date_time)}
                       size="small"
                       color="primary"
                       variant="outlined"
                     />
                   </Box>
-                  
-                  <Link 
+
+                  <Link
                     to={getPhotoViewLink(comment.photo)}
                     style={{ textDecoration: 'none' }}
                   >
-                    <Paper 
-                      elevation={1} 
-                      sx={{ 
+                    <Paper
+                      elevation={1}
+                      sx={{
                         p: 2,
                         backgroundColor: '#f8f9fa',
                         cursor: 'pointer',
@@ -224,10 +227,10 @@ function UserComments() {
                       </Typography>
                     </Paper>
                   </Link>
-                  
-                  <Typography 
-                    variant="caption" 
-                    color="text.secondary" 
+
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
                     sx={{ mt: 1, display: 'block' }}
                   >
                     Click to view photo and all comments

@@ -1,6 +1,7 @@
 const Photo = require('../models/photo.model');
 const User = require('../models/user.model');
 
+// GET /photosOfUser/:id 
 module.exports.photosOfUser = async (request, response) => {
     try {
         const userId = request.params.id;
@@ -60,6 +61,7 @@ module.exports.photosOfUser = async (request, response) => {
     }
 }
 
+// POST /new  
 module.exports.uploadPhoto = async (request, response) => {
     try {
         // Get user from session instead of request body
@@ -103,6 +105,7 @@ module.exports.uploadPhoto = async (request, response) => {
     }
 }
 
+// POST /commentsOfPhoto/:photo_id
 module.exports.addComment = async (request, response) => {
     try {
         const photoId = request.params.photo_id;
