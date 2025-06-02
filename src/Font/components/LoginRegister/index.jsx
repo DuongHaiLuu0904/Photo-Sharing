@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { useAppContext } from '../../contexts/AppContext';
 import { authLogin, authRegister } from '../../lib/fetchModelData';
+import './styles.css';
 
 function TabPanel({ children, value, index, ...other }) {
     return (
@@ -25,7 +26,7 @@ function TabPanel({ children, value, index, ...other }) {
             {...other}
         >
             {value === index && (
-                <Box sx={{ p: 3 }}>
+                <Box className="login-tabpanel">
                     {children}
                 </Box>
             )}
@@ -145,11 +146,9 @@ function LoginRegister() {
         } finally {
             setRegLoading(false);
         }
-    };
-
-    return (
-        <Container maxWidth="md" sx={{ mt: 8 }}>
-            <Paper elevation={3} sx={{ overflow: 'hidden' }}>
+    };    return (
+        <Container maxWidth="md" className="login-container">
+            <Paper elevation={3} className="login-paper">
                 <Tabs value={tabValue} onChange={handleTabChange} centered>
                     <Tab label="Login" />
                     <Tab label="Register" />
@@ -162,12 +161,12 @@ function LoginRegister() {
                     </Typography>
 
                     {loginError && (
-                        <Alert severity="error" sx={{ mb: 2 }}>
+                        <Alert severity="error" className="login-error">
                             {loginError}
                         </Alert>
                     )}
 
-                    <Box component="form" onSubmit={handleLogin} sx={{ mt: 2 }}>
+                    <Box component="form" onSubmit={handleLogin} className="login-form">
                         <TextField
                             fullWidth
                             label="Login Name"
@@ -194,12 +193,12 @@ function LoginRegister() {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
+                            className="login-button"
                             disabled={loginLoading || !loginName || !loginPassword}
                         >
                             {loginLoading ? (
                                 <>
-                                    <CircularProgress size={20} sx={{ mr: 1 }} />
+                                    <CircularProgress size={20} className="login-loading-spinner" />
                                     Logging in...
                                 </>
                             ) : (
@@ -216,18 +215,18 @@ function LoginRegister() {
                     </Typography>
 
                     {regError && (
-                        <Alert severity="error" sx={{ mb: 2 }}>
+                        <Alert severity="error" className="login-error">
                             {regError}
                         </Alert>
                     )}
 
                     {regSuccess && (
-                        <Alert severity="success" sx={{ mb: 2 }}>
+                        <Alert severity="success" className="login-success">
                             {regSuccess}
                         </Alert>
                     )}
 
-                    <Box component="form" onSubmit={handleRegister} sx={{ mt: 2 }}>
+                    <Box component="form" onSubmit={handleRegister} className="login-form">
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
                                 <TextField
@@ -327,12 +326,12 @@ function LoginRegister() {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
+                            className="login-button"
                             disabled={regLoading || !regData.login_name || !regData.password || !regData.first_name || !regData.last_name || regData.password !== regData.confirmPassword}
                         >
                             {regLoading ? (
                                 <>
-                                    <CircularProgress size={20} sx={{ mr: 1 }} />
+                                    <CircularProgress size={20} className="login-loading-spinner" />
                                     Registering...
                                 </>
                             ) : (

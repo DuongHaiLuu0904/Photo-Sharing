@@ -1,0 +1,73 @@
+/* UploadPhoto Component Styles */
+
+.upload-photo-container {
+    padding: 24px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.upload-photo-title {
+    margin-bottom: 16px;
+}
+
+.success-card {
+    margin-bottom: 24px;
+}
+
+.success-title {
+    margin-bottom: 16px;
+}
+
+.success-content {
+    margin-top: 16px;
+}
+
+.success-description {
+    margin-bottom: 16px;
+}
+
+.success-buttons {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
+}
+
+.upload-error {
+    margin-bottom: 16px;
+}
+
+.upload-icon-section {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.upload-icon {
+    font-size: 60px;
+    margin-bottom: 16px;
+}
+
+.upload-instructions {
+    margin-bottom: 16px;
+}
+
+.file-input-section {
+    margin-bottom: 24px;
+}
+
+.file-input {
+    display: none;
+}
+
+.choose-button {
+    margin-bottom: 16px;
+    padding: 16px;
+}
+
+.file-info {
+    padding: 16px;
+    background-color: #f5f5f5;
+}
+
+.upload-button {
+    padding: 12px;
+}

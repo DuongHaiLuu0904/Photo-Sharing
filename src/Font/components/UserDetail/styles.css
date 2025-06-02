@@ -1,0 +1,39 @@
+/* filepath: e:\World\photo-sharing-v1\src\Font\components\UserDetail\styles.css */
+
+/* Loading container styles */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+}
+
+/* Error message styles */
+.error-message {
+    padding: 24px;
+}
+
+/* Main container styles */
+.main-container {
+    padding: 24px;
+}
+
+/* Chips container styles */
+.chips-container {
+    margin-bottom: 16px;
+}
+
+/* Occupation chip styles */
+.occupation-chip {
+    margin-right: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+/* Location chip styles */
+.location-chip {
+    margin-bottom: 8px !important;
+}
+
+/* Button container styles */
+.button-container {
+    margin-top: 24px;
+}

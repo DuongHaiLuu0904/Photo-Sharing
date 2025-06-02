@@ -1,0 +1,320 @@
+/* UserPhotos Component Styles */
+
+/* Container chính của component */
+.user-photos-container {
+    padding: 24px;
+}
+
+/* Loading container - hiển thị spinner loading ở giữa màn hình */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+}
+
+/* Error container - hiển thị thông báo lỗi */
+.error-container {
+    padding: 24px;
+}
+
+/* ===== ADVANCED MODE STYLES ===== */
+
+/* Header container trong chế độ advanced với back button và thông tin */
+.advanced-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.advanced-header .back-button {
+    margin-right: 16px;
+}
+
+.advanced-header .title {
+    flex-grow: 1;
+}
+
+/* Navigation controls container - chứa các nút điều khiển navigation */
+.photo-navigation {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.photo-navigation .nav-button-left {
+    margin-right: 16px;
+}
+
+.photo-navigation .nav-info {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.photo-navigation .nav-button-right {
+    margin-left: 16px;
+}
+
+/* ===== PHOTO DISPLAY STYLES ===== */
+
+/* Photo container - card chứa ảnh */
+.photo-card {
+    margin-bottom: 32px;
+}
+
+/* Photo media styles - ảnh chính */
+.photo-media {
+    max-height: 600px;
+    object-fit: contain;
+    background-color: #f5f5f5;
+}
+
+/* Photo info container - chứa thông tin ảnh (thời gian, comments) */
+.photo-info {
+    margin-bottom: 16px;
+}
+
+/* ===== COMMENT STYLES ===== */
+
+/* Comment section container */
+.comments-section {
+    /* Kế thừa từ parent, không cần style đặc biệt */
+}
+
+/* Individual comment container */
+.comment-item {
+    /* Container cho mỗi comment - kế thừa từ parent */
+}
+
+/* Comment paper wrapper - tạo background và shadow */
+.comment-paper {
+    padding: 16px;
+    margin-bottom: 16px;
+    background-color: #f8f9fa;
+}
+
+/* Comment header - chứa avatar, tên user và thời gian */
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* Comment avatar styles */
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+    font-size: 0.8rem;
+}
+
+/* Comment user info container */
+.comment-user-info {
+    flex-grow: 1;
+}
+
+/* Comment user name link styles */
+.comment-user-link {
+    text-decoration: none;
+    color: #1976d2; /* Primary color */
+}
+
+.comment-user-link:hover {
+    text-decoration: underline;
+}
+
+/* ===== COMMENT FORM STYLES ===== */
+
+/* Login prompt container - hiển thị khi user chưa đăng nhập */
+.login-prompt {
+    margin-top: 16px;
+    padding: 16px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.login-prompt a {
+    color: inherit;
+}
+
+/* Comment form container */
+.comment-form {
+    margin-top: 16px;
+}
+
+/* Comment form error alert */
+.comment-form .error-alert {
+    margin-bottom: 16px;
+}
+
+/* Comment form main container */
+.comment-form-main {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+/* Current user avatar in comment form */
+.comment-form-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+}
+
+/* Comment form input container */
+.comment-form-input {
+    flex-grow: 1;
+}
+
+.comment-form-input .text-field {
+    margin-bottom: 8px;
+}
+
+/* Comment form submit button container */
+.comment-form-submit {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+
+/* Responsive cho màn hình nhỏ */
+@media (max-width: 768px) {
+    .user-photos-container {
+        padding: 16px;
+    }
+    
+    .advanced-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .advanced-header .back-button {
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+    
+    .photo-navigation {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .photo-navigation .nav-button-left,
+    .photo-navigation .nav-button-right {
+        margin: 0;
+    }
+    
+    .comment-form-main {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .comment-form-avatar {
+        align-self: flex-start;
+        margin-bottom: 8px;
+    }
+}
+
+/* Responsive cho màn hình rất nhỏ */
+@media (max-width: 480px) {
+    .user-photos-container {
+        padding: 12px;
+    }
+    
+    .photo-card {
+        margin-bottom: 24px;
+    }
+    
+    .comment-paper {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .comment-header {
+        margin-bottom: 6px;
+    }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Flex utilities */
+.flex {
+    display: flex;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+/* Spacing utilities */
+.mb-1 {
+    margin-bottom: 8px;
+}
+
+.mb-2 {
+    margin-bottom: 16px;
+}
+
+.mb-3 {
+    margin-bottom: 24px;
+}
+
+.mb-4 {
+    margin-bottom: 32px;
+}
+
+.mt-2 {
+    margin-top: 16px;
+}
+
+.mt-3 {
+    margin-top: 24px;
+}
+
+.mr-1 {
+    margin-right: 8px;
+}
+
+.mr-2 {
+    margin-right: 16px;
+}
+
+.ml-2 {
+    margin-left: 16px;
+}
+
+.p-2 {
+    padding: 16px;
+}
+
+.p-3 {
+    padding: 24px;
+}
+
+/* Text utilities */
+.text-center {
+    text-align: center;
+}
+
+.text-inherit {
+    color: inherit;
+}
+
+/* Background utilities */
+.bg-light {
+    background-color: #f5f5f5;
+}
+
+.bg-comment {
+    background-color: #f8f9fa;
+}

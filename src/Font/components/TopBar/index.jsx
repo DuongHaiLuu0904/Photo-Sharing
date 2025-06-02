@@ -1,198 +1,269 @@
+
+// Import React hooks để quản lý state và side effects
 import { useState, useEffect } from "react";
-import { AppBar, Toolbar, Typography, FormControlLabel, Checkbox, Button, Box } from "@mui/material";
+
+// Import các components Material-UI cho navigation bar
+import { 
+    AppBar,        // Component navigation bar chính
+    Toolbar,       // Container cho các elements trong AppBar
+    Typography,    // Component hiển thị text
+    FormControlLabel, // Label wrapper cho form controls
+    Checkbox,      // Component checkbox
+    Button,        // Component button
+    Box           // Container component
+} from "@mui/material";
+
+// Import router hooks để lấy location và navigate
 import { useLocation, useNavigate } from "react-router-dom";
+
+// Import icon từ Material-UI
 import { AddAPhoto } from "@mui/icons-material";
 
+// Import CSS styling
 import "./styles.css";
+
+// Import context để truy cập global state
 import { useAppContext } from "../../contexts/AppContext";
+
+// Import utilities cho API calls và authentication
 import fetchModel, { authCheckSession, authLogout } from "../../lib/fetchModelData";
 
+
 /**
- * Define TopBar, a React component of Project 4.
+ * TopBar component - Navigation bar chính của ứng dụng
+ * Component này hiển thị:
+ * - Tiêu đề ứng dụng
+ * - Context hiện tại (trang đang xem)
+ * - Checkbox để bật/tắt advanced features
+ * - Thông tin user và nút logout (khi đã đăng nhập)
+ * - Nút thêm ảnh (khi đã đăng nhập)
  */
 function TopBar() {
-  const {
-    currentContext,
-    advancedFeaturesEnabled,
-    setAdvancedFeaturesEnabled,
-    user,
-    isLoggedIn,
-    setUser,
-    setIsLoggedIn
-  } = useAppContext();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [fallbackContext, setFallbackContext] = useState('');
+    // Lấy các state và functions từ global context
+    const {
+        currentContext,              // Context hiện tại được set bởi các components
+        advancedFeaturesEnabled,     // Trạng thái advanced features
+        setAdvancedFeaturesEnabled,  // Function để toggle advanced features
+        user,                        // Thông tin user hiện tại
+        isLoggedIn,                  // Trạng thái đăng nhập
+        setUser,                     // Function để set user
+        setIsLoggedIn                // Function để set trạng thái đăng nhập
+    } = useAppContext();
+    
+    // Hook để lấy thông tin location hiện tại
+    const location = useLocation();
+    
+    // Hook để navigate programmatically
+    const navigate = useNavigate();
+    
+    // State để lưu context fallback khi currentContext chưa được set
+    const [fallbackContext, setFallbackContext] = useState('');
 
-  useEffect(() => {
-    // Check if user is already logged in on component mount
-    const checkSession = async () => {
-      try {
-        const userData = await authCheckSession();
-        if (userData && userData.login_name) {
-          setUser(userData);
-          setIsLoggedIn(true);
-        }
-      } catch (error) {
-        // User not logged in, which is fine
-        console.log('No active session');
-      }
-    };
+    // useEffect để kiểm tra session khi component mount
+    useEffect(() => {
+        /**
+         * Function để kiểm tra xem user đã đăng nhập chưa
+         * Gọi API để validate session hiện tại
+         */
+        const checkSession = async () => {
+            try {
+                // Gọi API để kiểm tra session
+                const userData = await authCheckSession();
+                if (userData && userData.login_name) {
+                    // Nếu có session hợp lệ, set user state
+                    setUser(userData);
+                    setIsLoggedIn(true);
+                }
+            } catch (error) {
+                // Không có session active, điều này bình thường
+                console.log('No active session');
+            }
+        };
 
-    checkSession();
-  }, [setUser, setIsLoggedIn]);
+        checkSession();
+    }, [setUser, setIsLoggedIn]);
 
-  useEffect(() => {
-    // Fallback context loading for when components haven't set context yet
-    const loadFallbackContext = async () => {
-      const path = location.pathname;
-      if (path.startsWith('/users/') && !path.includes('photos')) {
-        const userId = path.split('/')[2];
-        try {
-          const user = await fetchModel(`/user/${userId}`);
-          if (user) {
-            setFallbackContext(`${user.first_name} ${user.last_name}`);
-          }
-        } catch (error) {
-          console.error('Error loading user for TopBar:', error);
-        }
-      } else if (path.includes('/comments/')) {
-        const userId = path.split('/')[2];
-        try {
-          const user = await fetchModel(`/user/${userId}`);
-          if (user) {
-            setFallbackContext(`Comments by ${user.first_name} ${user.last_name}`);
-          }
-        } catch (error) {
-          console.error('Error loading user for TopBar:', error);
-        }
-      } else if (path.includes('/photos/')) {
-        const pathParts = path.split('/');
-        const userId = pathParts[2];
-        const photoId = pathParts[3];
-        try {
-          const user = await fetchModel(`/user/${userId}`);
-          if (user) {
-            if (photoId) {
-              // Individual photo view
-              const photos = await fetchModel(`/photo/photosOfUser/${userId}`);
-              const photoIndex = photos ? photos.findIndex(p => p._id === photoId) : -1;
-              if (photoIndex !== -1) {
-                setFallbackContext(`Photo ${photoIndex + 1} of ${photos.length} - ${user.first_name} ${user.last_name}`);
-              } else {
-                setFallbackContext(`Photos of ${user.first_name} ${user.last_name}`);
-              }
+    // useEffect để load fallback context dựa trên URL
+    useEffect(() => {
+        /**
+         * Function để load context fallback khi components chưa set context
+         * Parse URL để xác định context phù hợp:
+         * - /users/:id -> Tên user
+         * - /comments/:id -> "Comments by [User Name]"
+         * - /photos/:userId/:photoId? -> "Photos of [User Name]" hoặc "Photo X of Y"
+         */
+        const loadFallbackContext = async () => {
+            const path = location.pathname;
+            
+            // Case 1: User detail page (/users/:id)
+            if (path.startsWith('/users/') && !path.includes('photos')) {
+                const userId = path.split('/')[2];
+                try {
+                    const user = await fetchModel(`/user/${userId}`);
+                    if (user) {
+                        setFallbackContext(`${user.first_name} ${user.last_name}`);
+                    }
+                } catch (error) {
+                    console.error('Error loading user for TopBar:', error);
+                }
+            } 
+            // Case 2: User comments page (/comments/:id)
+            else if (path.includes('/comments/')) {
+                const userId = path.split('/')[2];
+                try {
+                    const user = await fetchModel(`/user/${userId}`);
+                    if (user) {
+                        setFallbackContext(`Comments by ${user.first_name} ${user.last_name}`);
+                    }
+                } catch (error) {
+                    console.error('Error loading user for TopBar:', error);
+                }
+            } 
+            // Case 3: Photos page (/photos/:userId/:photoId?)
+            else if (path.includes('/photos/')) {
+                const pathParts = path.split('/');
+                const userId = pathParts[2];
+                const photoId = pathParts[3]; // Optional: specific photo ID
+                
+                try {
+                    const user = await fetchModel(`/user/${userId}`);
+                    if (user) {
+                        if (photoId) {
+                            // Individual photo view - Hiển thị "Photo X of Y"
+                            const photos = await fetchModel(`/photo/photosOfUser/${userId}`);
+                            const photoIndex = photos ? photos.findIndex(p => p._id === photoId) : -1;
+                            if (photoIndex !== -1) {
+                                setFallbackContext(`Photo ${photoIndex + 1} of ${photos.length} - ${user.first_name} ${user.last_name}`);
+                            } else {
+                                setFallbackContext(`Photos of ${user.first_name} ${user.last_name}`);
+                            }
+                        } else {
+                            // All photos view - Hiển thị "Photos of [User Name]"
+                            setFallbackContext(`Photos of ${user.first_name} ${user.last_name}`);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading user for TopBar:', error);
+                }
             } else {
-              // All photos view
-              setFallbackContext(`Photos of ${user.first_name} ${user.last_name}`);
+                // Clear context cho các routes khác
+                setFallbackContext('');
             }
-          }
-        } catch (error) {
-          console.error('Error loading user for TopBar:', error);
+        };
+
+        // Chỉ load fallback context khi:
+        // 1. Không có currentContext từ components
+        // 2. User đã đăng nhập
+        if (!currentContext && isLoggedIn) {
+            loadFallbackContext();
         }
-      } else {
-        setFallbackContext('');
-      }
+    }, [location.pathname, currentContext, isLoggedIn]);
+
+    // Chọn context để hiển thị: currentContext có priority cao hơn fallbackContext
+    const displayContext = currentContext || fallbackContext;
+
+    /**
+     * Handler function để toggle advanced features
+     * @param {Event} event - Event từ checkbox
+     */
+    const handleAdvancedFeaturesToggle = (event) => {
+        setAdvancedFeaturesEnabled(event.target.checked);
     };
 
-    if (!currentContext && isLoggedIn) {
-      loadFallbackContext();
-    }
-  }, [location.pathname, currentContext, isLoggedIn]);
+    /**
+     * Handler function để logout user
+     * Gọi API logout và clear user state
+     */
+    const handleLogout = async () => {
+        try {
+            // Gọi API để logout trên server
+            await authLogout();
+            // Clear user state
+            setUser(null);
+            setIsLoggedIn(false);
+        } catch (error) {
+            console.error('Logout failed:', error);
+            // Vẫn clear user state ngay cả khi API call thất bại
+            setUser(null);
+            setIsLoggedIn(false);
+        }
+    };
 
-  const displayContext = currentContext || fallbackContext;
+    /**
+     * Handler function để navigate đến trang upload photo
+     */
+    const handleAddPhoto = () => {
+        navigate('/upload-photo');
+    };
 
-  const handleAdvancedFeaturesToggle = (event) => {
-    setAdvancedFeaturesEnabled(event.target.checked);
-  };
+    // Render main navigation bar
+    return (
+        <AppBar className="topbar-appBar" position="absolute">
+            <Toolbar>
+                {/* App title */}
+                <Typography variant="h5" color="inherit" className="topbar-title">
+                    Photo Sharing App
+                </Typography>
 
-  const handleLogout = async () => {
-    try {
-      await authLogout();
-      setUser(null);
-      setIsLoggedIn(false);
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // Still clear the user state even if the request fails
-      setUser(null);
-      setIsLoggedIn(false);
-    }
-  };
+                {/* Advanced Features checkbox - Chỉ hiển thị khi đã đăng nhập */}
+                {isLoggedIn && (
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={advancedFeaturesEnabled}
+                                onChange={handleAdvancedFeaturesToggle}
+                            />
+                        }
+                        label="Advanced Features"
+                        className="topbar-checkbox"
+                    />
+                )}
 
-  const handleAddPhoto = () => {
-    navigate('/upload-photo');
-  };
+                {/* User section - Conditional rendering dựa trên login status */}
+                {isLoggedIn ? (
+                    // Logged in state - Hiển thị user info và action buttons
+                    <Box className="topbar-user-section">
+                        {/* Add Photo button */}
+                        <Button
+                            color="inherit"
+                            startIcon={<AddAPhoto />}
+                            onClick={handleAddPhoto}
+                            className="topbar-button"
+                        >
+                            Thêm ảnh
+                        </Button>
+                        
+                        {/* User greeting */}
+                        <Typography variant="h6" color="inherit">
+                            Hello {user?.first_name}
+                        </Typography>
+                        
+                        {/* Logout button */}
+                        <Button
+                            color="inherit"
+                            onClick={handleLogout}
+                            className="topbar-button"
+                        >
+                            Logout
+                        </Button>
+                    </Box>
+                ) : (
+                    // Not logged in state - Hiển thị thông báo login
+                    <Typography variant="h6" color="inherit">
+                        Please Login
+                    </Typography>
+                )}
 
-  return (
-    <AppBar className="topbar-appBar" position="absolute">
-      <Toolbar>
-        <Typography variant="h5" color="inherit" sx={{ flexGrow: 1 }}>
-          Photo Sharing App
-        </Typography>
-
-        {isLoggedIn && (
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={advancedFeaturesEnabled}
-                onChange={handleAdvancedFeaturesToggle}
-                sx={{
-                  color: 'white',
-                  '&.Mui-checked': {
-                    color: 'white',
-                  },
-                }}
-              />
-            }
-            label="Advanced Features"
-            sx={{
-              color: 'white',
-              marginRight: 2
-            }}
-          />
-        )}
-
-        {isLoggedIn ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Button
-              color="inherit"
-              startIcon={<AddAPhoto />}
-              onClick={handleAddPhoto}
-              sx={{
-                border: '1px solid white',
-                borderRadius: 1
-              }}
-            >
-              Thêm ảnh
-            </Button>
-            <Typography variant="h6" color="inherit">
-              Hello {user?.first_name}
-            </Typography>
-            <Button
-              color="inherit"
-              onClick={handleLogout}
-              sx={{
-                border: '1px solid white',
-                borderRadius: 1
-              }}
-            >
-              Logout
-            </Button>
-          </Box>
-        ) : (
-          <Typography variant="h6" color="inherit">
-            Please Login
-          </Typography>
-        )}
-
-        {isLoggedIn && displayContext && (
-          <Typography variant="h6" color="inherit" sx={{ marginLeft: 2 }}>
-            {displayContext}
-          </Typography>
-        )}
-      </Toolbar>
-    </AppBar>
-  );
+                {/* Context display - Hiển thị context hiện tại */}
+                {isLoggedIn && displayContext && (
+                    <Typography variant="h6" color="inherit" className="topbar-context">
+                        {displayContext}
+                    </Typography>
+                )}
+            </Toolbar>
+        </AppBar>
+    );
 }
 
+// Export component để sử dụng ở các nơi khác trong ứng dụng
 export default TopBar;

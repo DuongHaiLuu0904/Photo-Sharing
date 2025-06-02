@@ -1,31 +1,116 @@
 /* UserComments styles */
 .user-comments-container {
-  padding: 20px;
+    padding: 20px;
 }
 
 .comment-card {
-  margin-bottom: 16px;
-  border-radius: 8px;
+    margin-bottom: 16px;
+    border-radius: 8px;
 }
 
 .comment-thumbnail {
-  border-radius: 4px;
-  transition: all 0.2s ease-in-out;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
 }
 
 .comment-thumbnail:hover {
-  transform: scale(1.02);
-  opacity: 0.9;
+    transform: scale(1.02);
+    opacity: 0.9;
 }
 
 .comment-content {
-  padding: 12px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  transition: all 0.2s ease-in-out;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
 }
 
 .comment-content:hover {
-  background-color: #e9ecef;
-  transform: translateY(-1px);
+    background-color: #e9ecef;
+    transform: translateY(-1px);
+}
+
+/* Loading container styles */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+}
+
+/* Error message styles */
+.error-message {
+    padding: 24px;
+}
+
+/* Main container styles */
+.main-container {
+    padding: 24px;
+}
+
+/* No comments container styles */
+.no-comments-container {
+    padding: 24px;
+}
+
+/* Comments count styles */
+.comments-count {
+    margin-bottom: 24px !important;
+}
+
+/* Individual comment card styles */
+.individual-comment-card {
+    margin-bottom: 24px !important;
+}
+
+/* Photo thumbnail styles */
+.photo-thumbnail {
+    height: 120px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.photo-thumbnail:hover {
+    opacity: 0.8 !important;
+    transform: scale(1.02) !important;
+}
+
+/* Comment header styles */
+.comment-header {
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 8px !important;
+}
+
+/* User avatar styles */
+.user-avatar {
+    width: 24px !important;
+    height: 24px !important;
+    margin-right: 8px !important;
+    font-size: 0.7rem !important;
+}
+
+/* User name styles */
+.user-name {
+    margin-right: 16px !important;
+}
+
+/* Comment paper styles */
+.comment-paper {
+    padding: 16px !important;
+    background-color: #f8f9fa !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.comment-paper:hover {
+    background-color: #e9ecef !important;
+    transform: translateY(-1px) !important;
+}
+
+/* View photo hint styles */
+.view-photo-hint {
+    margin-top: 8px !important;
+    display: block !important;
 }
