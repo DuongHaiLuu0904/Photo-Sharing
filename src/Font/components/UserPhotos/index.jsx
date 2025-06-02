@@ -30,6 +30,117 @@ import fetchModel, { addCommentToPhoto } from "../../lib/fetchModelData";
 import { useAppContext } from "../../contexts/AppContext";
 
 /**
+ * Component con để hiển thị form thêm comment
+ * @param {string} photoId - ID của ảnh cần comment
+ * @param {Object} commentTexts - Object chứa text cho từng photo
+ * @param {Function} setCommentTexts - Function để update comment texts
+ * @param {Object} commentErrors - Object chứa errors cho từng photo
+ * @param {Function} setCommentErrors - Function để update comment errors
+ * @param {Object} commentLoading - Object chứa loading states
+ * @param {Function} handleAddComment - Function để thêm comment
+ * @param {boolean} isLoggedIn - Trạng thái đăng nhập
+ * @param {Object} currentUser - Thông tin user hiện tại
+ */
+const CommentForm = ({
+    photoId,
+    commentTexts,
+    setCommentTexts,
+    commentErrors,
+    setCommentErrors,
+    commentLoading,
+    handleAddComment,
+    isLoggedIn,
+    currentUser
+}) => {
+    // Lấy các state riêng cho ảnh này
+    const currentText = commentTexts[photoId] || '';
+    const currentError = commentErrors[photoId] || '';
+    const isLoading = commentLoading[photoId] || false;
+
+    /**
+     * Xử lý thay đổi text trong textarea
+     */
+    const handleTextChange = (e) => {
+        setCommentTexts(prev => ({
+            ...prev,
+            [photoId]: e.target.value
+        }));
+
+        // Clear error khi user bắt đầu nhập
+        if (currentError) {
+            setCommentErrors(prev => ({
+                ...prev,
+                [photoId]: ''
+            }));
+        }
+    };
+
+    // Nếu user chưa đăng nhập, hiển thị thông báo
+    if (!isLoggedIn) {
+        return (
+            <Box className="login-prompt">
+                <Typography variant="body2" color="text.secondary">
+                    Please <Link to="/login" className="text-inherit">log in</Link> to add a comment.
+                </Typography>
+            </Box>
+        );
+    }
+
+    // Form comment cho user đã đăng nhập
+    return (
+        <Box className="comment-form">
+            <Typography variant="h6" gutterBottom>
+                Add a Comment
+            </Typography>
+
+            {/* Hiển thị error nếu có */}
+            {currentError && (
+                <Alert severity="error" className="error-alert">
+                    {currentError}
+                </Alert>
+            )}
+
+            {/* Container chính của form */}
+            <Box className="comment-form-main">
+                {/* Avatar của user hiện tại */}
+                <Avatar className="comment-form-avatar">
+                    {currentUser?.first_name?.[0]}{currentUser?.last_name?.[0]}
+                </Avatar>
+
+                {/* Form input và button */}
+                <Box className="comment-form-input">
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        placeholder="Write a comment..."
+                        value={currentText}
+                        onChange={handleTextChange}
+                        disabled={isLoading}
+                        variant="outlined"
+                        size="small"
+                        className="text-field"
+                    />
+
+                    {/* Button submit */}
+                    <Box className="comment-form-submit">
+                        <Button
+                            variant="contained"
+                            size="small"
+                            startIcon={<Send />}
+                            onClick={() => handleAddComment(photoId)}
+                            disabled={isLoading || !currentText.trim()}
+                        >
+                            {isLoading ? 'Posting...' : 'Post Comment'}
+                        </Button>
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
+    );
+};
+
+/**
  * Component UserPhotos - Hiển thị danh sách ảnh của một user cụ thể
  * Hỗ trợ 2 chế độ xem: All Photos (hiển thị tất cả) và Single Photo Stepper (từng ảnh một)
  * Cho phép xem và thêm comment cho từng ảnh
@@ -233,99 +344,6 @@ function UserPhotos() {
         }
     };
 
-    /**
-     * Component con để hiển thị form thêm comment
-     * @param {string} photoId - ID của ảnh cần comment
-     */
-    const CommentForm = ({ photoId }) => {
-        // Lấy các state riêng cho ảnh này
-        const currentText = commentTexts[photoId] || '';
-        const currentError = commentErrors[photoId] || '';
-        const isLoading = commentLoading[photoId] || false;
-
-        /**
-         * Xử lý thay đổi text trong textarea
-         */
-        const handleTextChange = (e) => {
-            setCommentTexts(prev => ({
-                ...prev,
-                [photoId]: e.target.value
-            }));
-
-            // Clear error khi user bắt đầu nhập
-            if (currentError) {
-                setCommentErrors(prev => ({
-                    ...prev,
-                    [photoId]: ''
-                }));
-            }
-        };
-
-        // Nếu user chưa đăng nhập, hiển thị thông báo
-        if (!isLoggedIn) {
-            return (
-                <Box className="login-prompt">
-                    <Typography variant="body2" color="text.secondary">
-                        Please <Link to="/login" className="text-inherit">log in</Link> to add a comment.
-                    </Typography>
-                </Box>
-            );
-        }
-
-        // Form comment cho user đã đăng nhập
-        return (
-            <Box className="comment-form">
-                <Typography variant="h6" gutterBottom>
-                    Add a Comment
-                </Typography>
-
-                {/* Hiển thị error nếu có */}
-                {currentError && (
-                    <Alert severity="error" className="error-alert">
-                        {currentError}
-                    </Alert>
-                )}
-
-                {/* Container chính của form */}
-                <Box className="comment-form-main">
-                    {/* Avatar của user hiện tại */}
-                    <Avatar className="comment-form-avatar">
-                        {currentUser?.first_name?.[0]}{currentUser?.last_name?.[0]}
-                    </Avatar>
-
-                    {/* Form input và button */}
-                    <Box className="comment-form-input">
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={3}
-                            placeholder="Write a comment..."
-                            value={currentText}
-                            onChange={handleTextChange}
-                            disabled={isLoading}
-                            variant="outlined"
-                            size="small"
-                            className="text-field"
-                        />
-
-                        {/* Button submit */}
-                        <Box className="comment-form-submit">
-                            <Button
-                                variant="contained"
-                                size="small"
-                                startIcon={<Send />}
-                                onClick={() => handleAddComment(photoId)}
-                                disabled={isLoading || !currentText.trim()}
-                            >
-                                {isLoading ? 'Posting...' : 'Post Comment'}
-                            </Button>
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
-        );
-    };
-
     // useEffect thứ ba: Thêm hỗ trợ điều khiển bàn phím cho chế độ advanced
     useEffect(() => {
         // Chỉ hoạt động trong chế độ advanced
@@ -503,10 +521,18 @@ function UserPhotos() {
                                     </Box>
                                 ))}
                             </Box>
-                        )}
-
-                        {/* Form thêm comment mới - sử dụng component con CommentForm */}
-                        <CommentForm photoId={currentPhoto._id} />
+                        )}                        {/* Form thêm comment mới - sử dụng component con CommentForm */}
+                        <CommentForm
+                            photoId={currentPhoto._id}
+                            commentTexts={commentTexts}
+                            setCommentTexts={setCommentTexts}
+                            commentErrors={commentErrors}
+                            setCommentErrors={setCommentErrors}
+                            commentLoading={commentLoading}
+                            handleAddComment={handleAddComment}
+                            isLoggedIn={isLoggedIn}
+                            currentUser={currentUser}
+                        />
                     </CardContent>
                 </Card>
             </Box>
@@ -590,9 +616,18 @@ function UserPhotos() {
                                 ))}
                             </Box>
                         )}
-
                         {/* Form thêm comment mới - sử dụng component con đã định nghĩa ở trên */}
-                        <CommentForm photoId={photo._id} />
+                        <CommentForm
+                            photoId={photo._id}
+                            commentTexts={commentTexts}
+                            setCommentTexts={setCommentTexts}
+                            commentErrors={commentErrors}
+                            setCommentErrors={setCommentErrors}
+                            commentLoading={commentLoading}
+                            handleAddComment={handleAddComment}
+                            isLoggedIn={isLoggedIn}
+                            currentUser={currentUser}
+                        />
                     </CardContent>
                 </Card>
             ))}
@@ -600,5 +635,4 @@ function UserPhotos() {
     );
 }
 
-// Export component để có thể import và sử dụng ở nơi khác
 export default UserPhotos;

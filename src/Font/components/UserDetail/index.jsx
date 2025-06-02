@@ -1,6 +1,4 @@
-// Import React và các hooks cần thiết
 import React, { useEffect, useState } from "react";
-// Import các component UI từ Material-UI
 import {
     Typography,    // Component hiển thị text với các kiểu chữ khác nhau
     Card,         // Component card để tạo layout đẹp
@@ -10,14 +8,10 @@ import {
     Chip,         // Component hiển thị thông tin dạng chip (tag)
     CircularProgress  // Component loading spinner
 } from "@mui/material";
-// Import Link để điều hướng và useParams để lấy params từ URL
 import { Link, useParams } from "react-router-dom";
 
-// Import file CSS cho component
 import "./styles.css";
-// Import function để gọi API
 import fetchModel from "../../lib/fetchModelData";
-// Import context để quản lý state toàn cục
 import { useAppContext } from "../../contexts/AppContext";
 
 
@@ -138,5 +132,4 @@ function UserDetail() {
     );
 }
 
-// Export component để có thể import ở các file khác
 export default UserDetail;

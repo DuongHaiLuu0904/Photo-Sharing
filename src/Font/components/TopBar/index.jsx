@@ -1,8 +1,4 @@
-
-// Import React hooks để quản lý state và side effects
 import { useState, useEffect } from "react";
-
-// Import các components Material-UI cho navigation bar
 import { 
     AppBar,        // Component navigation bar chính
     Toolbar,       // Container cho các elements trong AppBar
@@ -12,21 +8,13 @@ import {
     Button,        // Component button
     Box           // Container component
 } from "@mui/material";
-
-// Import router hooks để lấy location và navigate
-import { useLocation, useNavigate } from "react-router-dom";
-
-// Import icon từ Material-UI
 import { AddAPhoto } from "@mui/icons-material";
 
-// Import CSS styling
-import "./styles.css";
-
-// Import context để truy cập global state
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../contexts/AppContext";
-
-// Import utilities cho API calls và authentication
 import fetchModel, { authCheckSession, authLogout } from "../../lib/fetchModelData";
+
+import "./styles.css";
 
 
 /**

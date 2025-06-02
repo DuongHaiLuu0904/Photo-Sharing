@@ -1,8 +1,4 @@
-
-// Import React hooks để quản lý state và side effects
-import React, { useEffect, useState } from "react";
-
-// Import các components Material-UI cho giao diện
+import { useEffect, useState } from "react";
 import {
     Typography,    // Component hiển thị text với các style khác nhau
     Card,         // Component card container
@@ -16,16 +12,10 @@ import {
     Chip          // Component hiển thị label nhỏ
 } from "@mui/material";
 
-// Import router hooks để điều hướng và lấy params từ URL
 import { Link, useParams } from "react-router-dom";
 
-// Import file CSS cho styling
 import "./styles.css";
-
-// Import utility function để fetch data từ API
 import fetchModel from "../../lib/fetchModelData";
-
-// Import context để truy cập global state
 import { useAppContext } from "../../contexts/AppContext";
 
 
@@ -288,5 +278,4 @@ function UserComments() {
     );
 }
 
-// Export component để sử dụng ở nơi khác
 export default UserComments;

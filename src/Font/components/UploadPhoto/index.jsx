@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import {
     Box,          // Container component với flexbox
     Card,         // Component card có shadow và border radius
@@ -243,5 +242,4 @@ function UploadPhoto() {
     );
 }
 
-// Export component để sử dụng ở các nơi khác trong ứng dụng
 export default UploadPhoto;

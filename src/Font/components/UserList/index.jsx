@@ -1,6 +1,4 @@
-// Import các thư viện React cần thiết
 import React, { useState, useEffect } from "react";
-// Import các Material-UI components để xây dựng giao diện
 import {
     Divider,         // Component đường kẻ phân cách
     List,            // Component danh sách chính
@@ -12,14 +10,10 @@ import {
     Box,             // Component container linh hoạt
     Chip,            // Component chip hiển thị số liệu thống kê
 } from "@mui/material";
-// Import React Router để điều hướng và lấy thông tin location
 import { Link, useLocation } from "react-router-dom";
 
-// Import CSS styles cho component
 import "./styles.css";
-// Import hàm fetchModel để gọi API
 import fetchModel from "../../lib/fetchModelData";
-// Import context để lấy trạng thái đăng nhập
 import { useAppContext } from "../../contexts/AppContext";
 
 /**
@@ -217,5 +211,4 @@ function UserList() {
     );
 }
 
-// Export component để có thể import và sử dụng ở nơi khác
 export default UserList;
