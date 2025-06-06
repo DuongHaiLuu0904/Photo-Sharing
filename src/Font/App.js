@@ -11,6 +11,7 @@ import LoginRegister from "./components/LoginRegister";
 import UploadPhoto from "./components/UploadPhoto";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AppProvider } from "./contexts/AppContext";
+import EditUser from "./components/EditUser";
 
 const App = (props) => {
     return (
@@ -79,6 +80,14 @@ const App = (props) => {
                                         element={
                                             <ProtectedRoute>
                                                 <UserList />
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                    <Route
+                                        path="/user/edit/:userId"
+                                        element={
+                                            <ProtectedRoute>
+                                                <EditUser />
                                             </ProtectedRoute>
                                         }
                                     />

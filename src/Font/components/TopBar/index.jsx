@@ -17,17 +17,7 @@ import fetchModel, { authCheckSession, authLogout } from "../../lib/fetchModelDa
 import "./styles.css";
 
 
-/**
- * TopBar component - Navigation bar chính của ứng dụng
- * Component này hiển thị:
- * - Tiêu đề ứng dụng
- * - Context hiện tại (trang đang xem)
- * - Checkbox để bật/tắt advanced features
- * - Thông tin user và nút logout (khi đã đăng nhập)
- * - Nút thêm ảnh (khi đã đăng nhập)
- */
 function TopBar() {
-    // Lấy các state và functions từ global context
     const {
         currentContext,              // Context hiện tại được set bởi các components
         advancedFeaturesEnabled,     // Trạng thái advanced features
@@ -222,6 +212,14 @@ function TopBar() {
                         <Typography variant="h6" color="inherit">
                             Hello {user?.first_name}
                         </Typography>
+
+                        <Button
+                            color="inherit"
+                            onClick={() => navigate(`/user/edit/${user._id}`)}
+                            className="edit-button"
+                        >
+                            Edit 
+                        </Button>
                         
                         <Button
                             color="inherit"

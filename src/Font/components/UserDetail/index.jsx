@@ -83,7 +83,6 @@ function UserDetail() {
         );
     }
 
-    // Render UI chính khi đã load thành công dữ liệu user
     return (
         <Box className="main-container"> 
             <Card>

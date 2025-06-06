@@ -122,3 +122,38 @@ module.exports.register = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+module.exports.update = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { first_name, last_name, location, description, occupation } = req.body;
+
+        // Find user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update user fields
+        user.first_name = first_name.trim();
+        user.last_name = last_name.trim();
+        user.location = location ? location.trim() : '';
+        user.description = description ? description.trim() : '';
+        user.occupation = occupation ? occupation.trim() : '';
+
+        const updatedUser = await user.save();
+
+        res.status(200).json({
+            _id: updatedUser._id,
+            first_name: updatedUser.first_name,
+            last_name: updatedUser.last_name,
+            location: updatedUser.location,
+            description: updatedUser.description,
+            occupation: updatedUser.occupation
+        });
+
+    } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

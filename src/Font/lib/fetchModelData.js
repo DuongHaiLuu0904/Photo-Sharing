@@ -150,7 +150,7 @@ async function uploadPhoto(file) {
 async function authRegister(userData) {
     try {
         const response = await fetch(`${API_BASE_URL}/user`, {
-            method: 'POST',
+            method: 'PATCH',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
@@ -171,5 +171,28 @@ async function authRegister(userData) {
     }
 }
 
+async function updateUser(userData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/user/${userData._id}`, {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        }
+        return data;
+    } catch (error) {
+        console.error('Update user failed:', error);
+        throw error;
+    }
+}
+
 export default fetchModel;
-export { authLogin, authLogout, authCheckSession, addCommentToPhoto, uploadPhoto, authRegister };
+export { authLogin, authLogout, authCheckSession, addCommentToPhoto, uploadPhoto, authRegister, updateUser };

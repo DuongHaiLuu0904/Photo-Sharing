@@ -13,5 +13,6 @@ router.get("/list", authentication.requireAuth, controller.list);
 // GET /user/:id - Trả về thông tin chi tiết của một người dùng
 router.get("/:id", authentication.requireAuth, controller.detail);
 
+router.patch("/:id", authentication.requireAuth, controller.update);
 
 module.exports = router;
