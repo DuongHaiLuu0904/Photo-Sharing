@@ -1,20 +1,35 @@
-import { useAppContext } from '../../contexts/AppContext';
-import LoginRegister from '../LoginRegister';
+import { CircularProgress, Box } from "@mui/material";
+import { useAppContext } from "../../contexts/AppContext";
+import LoginRegister from "../LoginRegister";
 
 function ProtectedRoute({ children, hideOnLogin = false }) {
-    const { isLoggedIn } = useAppContext();
+  const { isLoggedIn, isLoading } = useAppContext();
 
-    // Nếu hideOnLogin=true và chưa đăng nhập, ẩn component
-    if (hideOnLogin && !isLoggedIn) {
-        return null;
-    }
+  // Show loading spinner while checking authentication status
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-    // Nếu hideOnLogin=false và chưa đăng nhập, hiển thị LoginRegister
-    if (!hideOnLogin && !isLoggedIn) {
-        return <LoginRegister />;
-    }
+  // Nếu hideOnLogin=true và chưa đăng nhập, ẩn component
+  if (hideOnLogin && !isLoggedIn) {
+    return null;
+  }
 
-    return children;
+  // Nếu hideOnLogin=false và chưa đăng nhập, hiển thị LoginRegister
+  if (!hideOnLogin && !isLoggedIn) {
+    return <LoginRegister />;
+  }
+
+  return children;
 }
 
 export default ProtectedRoute;

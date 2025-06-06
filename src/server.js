@@ -1,5 +1,5 @@
 const express = require("express");
-require('dotenv').config(); // Load environment variables from .env file
+require("dotenv").config(); // Load environment variables from .env file
 const app = express();
 
 const cors = require("cors");
@@ -14,28 +14,35 @@ const AdminRouter = require("./Back/routes/admin.route");
 
 dbConnect();
 
-app.use(cors({
-    origin: 'http://localhost:3000',
+app.use(
+  cors({
+    origin: "https://m67j9p-3000.csb.app",
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-}));
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cookie",
+      "X-Requested-With",
+    ],
+    exposedHeaders: ["set-cookie"],
+    optionsSuccessStatus: 200,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/images', express.static(path.join(__dirname, '../public/images')));
+app.use("/images", express.static(path.join(__dirname, "../public/images")));
 
 app.use("/admin", AdminRouter);
-
 app.use("/user", UserRouter);
 app.use("/photo", PhotoRouter);
 
 app.get("/", (request, response) => {
-    response.send({ message: "Hello from photo-sharing app API!" });
+  response.send({ message: "Hello from photo-sharing app API!" });
 });
 
-
 app.listen(8000, () => {
-    console.log(`🚀 Server listening on port ${8000}`);
+  console.log(`🚀 Server listening on port ${8000}`);
 });
