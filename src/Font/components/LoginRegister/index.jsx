@@ -146,7 +146,8 @@ function LoginRegister() {
         } finally {
             setRegLoading(false);
         }
-    };    return (
+    };    
+    return (
         <Container maxWidth="md" className="login-container">
             <Paper elevation={3} className="login-paper">
                 <Tabs value={tabValue} onChange={handleTabChange} centered>
@@ -335,7 +336,7 @@ function LoginRegister() {
                                     Registering...
                                 </>
                             ) : (
-                                'Đăng ký tôi'
+                                'Đăng ký'
                             )}
                         </Button>
                     </Box>

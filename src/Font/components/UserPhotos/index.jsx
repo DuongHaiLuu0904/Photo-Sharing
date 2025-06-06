@@ -458,19 +458,19 @@ function UserPhotos() {
                 <Card>
                     {/* CardMedia: Component hiển thị ảnh chính */}
                     <CardMedia
-                        component="img"                              // Sử dụng img tag để hiển thị ảnh
-                        image={currentPhoto.file_name}               // Đường dẫn đến file ảnh
-                        alt={`Photo by ${user.first_name} ${user.last_name}`}  // Alt text cho accessibility
+                        component="img"                              
+                        image={currentPhoto.file_name}               
+                        alt={`Photo by ${user.first_name} ${user.last_name}`}  
                         className="photo-media"
                     />
                     <CardContent>
                         {/* Hiển thị thời gian chụp ảnh dưới dạng chip */}
                         <Box className="photo-info">
                             <Chip
-                                label={formatDateTime(currentPhoto.date_time)}  // Text hiển thị thời gian đã format
-                                size="small"                                     // Kích thước nhỏ
-                                color="primary"                                  // Màu primary theme
-                                variant="outlined"                               // Style viền, không fill
+                                label={formatDateTime(currentPhoto.date_time)}  
+                                size="small"                                     
+                                color="primary"                                 
+                                variant="outlined"                               
                             />
                         </Box>
 
@@ -485,9 +485,7 @@ function UserPhotos() {
                                 {/* Map qua từng comment để hiển thị */}
                                 {currentPhoto.comments.map((comment, index) => (
                                     <Box key={comment._id} className="comment-item">
-                                        {/* Paper container cho từng comment với shadow nhẹ */}
                                         <Paper elevation={1} className="comment-paper">
-                                            {/* Header của comment: avatar + tên user + thời gian */}
                                             <Box className="comment-header">
                                                 {/* Avatar hiển thị chữ cái đầu của họ tên */}
                                                 <Avatar className="comment-avatar">
@@ -498,8 +496,8 @@ function UserPhotos() {
                                                     {/* Tên user - clickable link đến trang user */}
                                                     <Typography
                                                         variant="subtitle2"
-                                                        component={Link}         // Sử dụng React Router Link
-                                                        to={`/users/${comment.user._id}`}  // URL đến trang user
+                                                        component={Link}        
+                                                        to={`/users/${comment.user._id}`} 
                                                         className="comment-user-link"
                                                     >
                                                         {comment.user.first_name} {comment.user.last_name}
@@ -520,7 +518,8 @@ function UserPhotos() {
                                     </Box>
                                 ))}
                             </Box>
-                        )}                        {/* Form thêm comment mới - sử dụng component con CommentForm */}
+                        )}                        
+                        {/* Form thêm comment mới - sử dụng component con CommentForm */}
                         <CommentForm
                             photoId={currentPhoto._id}
                             commentTexts={commentTexts}
@@ -551,9 +550,9 @@ function UserPhotos() {
                 <Card key={photo._id} className="photo-card">        {/* Mỗi ảnh trong một Card riêng với margin bottom */}
                     {/* CardMedia: Hiển thị ảnh chính */}
                     <CardMedia
-                        component="img"                              // Sử dụng img element
-                        image={photo.file_name}                      // Đường dẫn file ảnh
-                        alt={`Photo by ${user.first_name} ${user.last_name}`}  // Alt text cho screen reader
+                        component="img"                              
+                        image={photo.file_name}                    
+                        alt={`Photo by ${user.first_name} ${user.last_name}`} 
                         className="photo-media"
                     />
                     {/* CardContent: Chứa thông tin và comments của ảnh */}
@@ -561,10 +560,10 @@ function UserPhotos() {
                         {/* Box chứa chip thời gian */}
                         <Box className="photo-info">
                             <Chip
-                                label={formatDateTime(photo.date_time)}     // Hiển thị thời gian đã format
-                                size="small"                                 // Kích thước nhỏ
-                                color="primary"                              // Màu chủ đạo
-                                variant="outlined"                           // Style có viền
+                                label={formatDateTime(photo.date_time)}     
+                                size="small"                               
+                                color="primary"                             
+                                variant="outlined"                         
                             />
                         </Box>
 
@@ -578,10 +577,8 @@ function UserPhotos() {
 
                                 {/* Render từng comment */}
                                 {photo.comments.map((comment, index) => (
-                                    <Box key={comment._id} className="comment-item">             {/* Container cho mỗi comment */}
-                                        {/* Paper wrapper tạo background và shadow cho comment */}
+                                    <Box key={comment._id} className="comment-item">         
                                         <Paper elevation={1} className="comment-paper">
-                                            {/* Header comment: Avatar + User info + Time */}
                                             <Box className="comment-header">
                                                 {/* Avatar tròn với chữ cái đầu họ tên */}
                                                 <Avatar className="comment-avatar">
@@ -592,8 +589,8 @@ function UserPhotos() {
                                                     {/* Tên user - là link điều hướng đến trang user */}
                                                     <Typography
                                                         variant="subtitle2"          // Font weight đậm, size vừa
-                                                        component={Link}             // Sử dụng React Router Link
-                                                        to={`/users/${comment.user._id}`}  // URL đến trang chi tiết user
+                                                        component={Link}            
+                                                        to={`/users/${comment.user._id}`}  
                                                         className="comment-user-link"
                                                     >
                                                         {comment.user.first_name} {comment.user.last_name}
@@ -604,6 +601,7 @@ function UserPhotos() {
                                                     </Typography>
                                                 </Box>
                                             </Box>
+                                            
                                             {/* Nội dung chính của comment */}
                                             <Typography variant="body2">
                                                 {comment.comment}

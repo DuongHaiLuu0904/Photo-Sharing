@@ -126,29 +126,27 @@ function UploadPhoto() {
     };    // Render main component
     return (
         <Box className="upload-photo-container">
-            {/* Header title */}
+
             <Typography variant="h4" gutterBottom className="upload-photo-title">
                 Upload New Photo
             </Typography>
 
-            {/* Conditional rendering dựa trên trạng thái upload */}
             {uploadSuccess ? (
-                // Success state - Hiển thị khi upload thành công
+
                 <Card className="success-card">
                     <CardContent>
-                        {/* Success message */}
+
                         <Typography variant="h6" color="success.main" gutterBottom className="success-title">
                             ✅ Photo Uploaded Successfully!
                         </Typography>
 
                         {uploadedPhoto && (
                             <Box className="success-content">
-                                {/* Success description */}
+ 
                                 <Typography variant="body1" gutterBottom className="success-description">
                                     Your photo has been uploaded and is now available in your gallery.
                                 </Typography>
 
-                                {/* Action buttons sau khi upload thành công */}
                                 <Box className="success-buttons">
                                     <Button
                                         variant="contained"
@@ -168,17 +166,16 @@ function UploadPhoto() {
                     </CardContent>
                 </Card>
             ) : (
-                // Upload form state - Form để chọn và upload file
+
                 <Card>
                     <CardContent>
-                        {/* Error alert - Hiển thị khi có lỗi */}
+
                         {uploadError && (
                             <Alert severity="error" className="upload-error">
                                 {uploadError}
                             </Alert>
                         )}
 
-                        {/* Upload instructions section */}
                         <Box className="upload-icon-section">
                             <PhotoCamera className="upload-icon" color="disabled" />
                             <Typography variant="h6" gutterBottom className="upload-instructions">
@@ -189,9 +186,8 @@ function UploadPhoto() {
                             </Typography>
                         </Box>
 
-                        {/* File input section */}
                         <Box className="file-input-section">
-                            {/* Hidden file input */}
+
                             <input
                                 id="photo-upload-input"
                                 type="file"
@@ -199,7 +195,7 @@ function UploadPhoto() {
                                 onChange={handleFileSelect}
                                 className="file-input"
                             />
-                            {/* Custom styled button cho file input */}
+
                             <label htmlFor="photo-upload-input">
                                 <Button
                                     variant="outlined"
@@ -211,7 +207,6 @@ function UploadPhoto() {
                                 </Button>
                             </label>
 
-                            {/* File info display - Hiển thị thông tin file đã chọn */}
                             {selectedFile && (
                                 <Paper className="file-info">
                                     <Typography variant="body2">
@@ -224,7 +219,6 @@ function UploadPhoto() {
                             )}
                         </Box>
 
-                        {/* Upload button */}
                         <Button
                             variant="contained"
                             fullWidth

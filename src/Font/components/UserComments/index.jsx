@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import {
-    Typography,    // Component hiển thị text với các style khác nhau
-    Card,         // Component card container
-    CardContent,  // Nội dung bên trong card
-    Box,          // Container flex box
-    Avatar,       // Component hiển thị avatar tròn
-    Paper,        // Component có background và shadow
-    CircularProgress, // Component loading spinner
-    Grid,         // Component layout grid system
-    CardMedia,    // Component hiển thị media (hình ảnh)
-    Chip          // Component hiển thị label nhỏ
+    Typography,   
+    Card,        
+    CardContent,  
+    Box,        
+    Avatar,       
+    Paper,       
+    CircularProgress, 
+    Grid,        
+    CardMedia,   
+    Chip          
 } from "@mui/material";
 
 import { Link, useParams } from "react-router-dom";
@@ -197,7 +197,7 @@ function UserComments() {
     // Render main content - Hiển thị danh sách comments khi có data
     return (
         <Box className="main-container">
-            {/* Header với tên user và số lượng comments */}
+
             <Typography variant="h5" gutterBottom>
                 Comments by {user.first_name} {user.last_name}
             </Typography>
@@ -205,13 +205,12 @@ function UserComments() {
             <Typography variant="body2" color="text.secondary" className="comments-count">
                 Total comments: {comments.length}
             </Typography>
-            
-            {/* Danh sách comments - Map qua từng comment và render card */}
+        
             {comments.map((comment) => (
                 <Card key={`${comment.photo._id}-${comment._id}`} className="individual-comment-card">
                     <CardContent>
                         <Grid container spacing={2}>
-                            {/* Cột trái: Photo thumbnail */}
+                     
                             <Grid item xs={12} sm={3}>
                                 <Link
                                     to={getPhotoViewLink(comment.photo)}
@@ -226,10 +225,9 @@ function UserComments() {
                                 </Link>
                             </Grid>
 
-                            {/* Cột phải: Comment content */}
+                         
                             <Grid item xs={12} sm={9}>
                                 <Box>
-                                    {/* Header của comment: Avatar, tên user, thời gian */}
                                     <Box className="comment-header">
                                         <Avatar className="user-avatar">
                                             {user.first_name[0]}{user.last_name[0]}
@@ -245,7 +243,6 @@ function UserComments() {
                                         />
                                     </Box>
 
-                                    {/* Nội dung comment trong Paper có thể click */}
                                     <Link
                                         to={getPhotoViewLink(comment.photo)}
                                         style={{ textDecoration: 'none' }}
@@ -260,7 +257,6 @@ function UserComments() {
                                         </Paper>
                                     </Link>
                                     
-                                    {/* Hint text để người dùng biết có thể click */}
                                     <Typography
                                         variant="caption"
                                         color="text.secondary"

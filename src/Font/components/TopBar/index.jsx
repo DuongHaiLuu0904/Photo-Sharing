@@ -184,11 +184,11 @@ function TopBar() {
         navigate('/upload-photo');
     };
 
-    // Render main navigation bar
+
     return (
         <AppBar className="topbar-appBar" position="absolute">
             <Toolbar>
-                {/* App title */}
+
                 <Typography variant="h5" color="inherit" className="topbar-title">
                     Photo Sharing App
                 </Typography>
@@ -207,11 +207,9 @@ function TopBar() {
                     />
                 )}
 
-                {/* User section - Conditional rendering dựa trên login status */}
                 {isLoggedIn ? (
-                    // Logged in state - Hiển thị user info và action buttons
                     <Box className="topbar-user-section">
-                        {/* Add Photo button */}
+                
                         <Button
                             color="inherit"
                             startIcon={<AddAPhoto />}
@@ -221,12 +219,10 @@ function TopBar() {
                             Thêm ảnh
                         </Button>
                         
-                        {/* User greeting */}
                         <Typography variant="h6" color="inherit">
                             Hello {user?.first_name}
                         </Typography>
                         
-                        {/* Logout button */}
                         <Button
                             color="inherit"
                             onClick={handleLogout}
@@ -236,13 +232,12 @@ function TopBar() {
                         </Button>
                     </Box>
                 ) : (
-                    // Not logged in state - Hiển thị thông báo login
+
                     <Typography variant="h6" color="inherit">
                         Please Login
                     </Typography>
                 )}
 
-                {/* Context display - Hiển thị context hiện tại */}
                 {isLoggedIn && displayContext && (
                     <Typography variant="h6" color="inherit" className="topbar-context">
                         {displayContext}
@@ -253,5 +248,4 @@ function TopBar() {
     );
 }
 
-// Export component để sử dụng ở các nơi khác trong ứng dụng
 export default TopBar;

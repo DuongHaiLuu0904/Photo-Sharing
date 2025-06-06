@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-    Typography,    // Component hiển thị text với các kiểu chữ khác nhau
-    Card,         // Component card để tạo layout đẹp
-    CardContent,  // Nội dung bên trong card
-    Button,       // Component button
-    Box,          // Container linh hoạt để layout
-    Chip,         // Component hiển thị thông tin dạng chip (tag)
-    CircularProgress  // Component loading spinner
+    Typography,   
+    Card,       
+    CardContent,  
+    Button,      
+    Box,          
+    Chip,       
+    CircularProgress 
 } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 
@@ -85,23 +85,23 @@ function UserDetail() {
 
     // Render UI chính khi đã load thành công dữ liệu user
     return (
-        <Box className="main-container"> {/* Container chính với padding */}
-            <Card> {/* Card chứa toàn bộ thông tin user */}
+        <Box className="main-container"> 
+            <Card>
                 <CardContent>
-                    {/* Hiển thị tên đầy đủ của user */}
+                   
                     <Typography variant="h4" component="h1" gutterBottom>
                         {user.first_name} {user.last_name}
                     </Typography>
 
-                    {/* Container chứa các chip thông tin */}
+                
                     <Box className="chips-container">
-                        {/* Chip hiển thị nghề nghiệp */}
+
                         <Chip
                             label={user.occupation}
                             color="primary"
                             className="occupation-chip"
                         />
-                        {/* Chip hiển thị địa điểm */}
+
                         <Chip
                             label={user.location}
                             variant="outlined"
@@ -109,14 +109,12 @@ function UserDetail() {
                         />
                     </Box>
 
-                    {/* Hiển thị mô tả của user */}
+
                     <Typography variant="body1" paragraph>
                         {user.description}
                     </Typography>
 
-                    {/* Container chứa button xem ảnh */}
                     <Box className="button-container">
-                        {/* Button link đến trang xem ảnh của user */}
                         <Button
                             variant="contained"
                             component={Link}

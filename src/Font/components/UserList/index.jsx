@@ -140,7 +140,6 @@ function UserList() {
         );
     }
 
-    // Render chính: Hiển thị danh sách users với thống kê
     return (
         <div>
             {/* Header title cho danh sách users */}
@@ -161,15 +160,15 @@ function UserList() {
                             <ListItem disablePadding>
                                 {/* ListItemButton: Có thể click để navigate đến trang user detail */}
                                 <ListItemButton
-                                    component={Link}                                    // Sử dụng React Router Link
-                                    to={`/users/${user._id}`}                          // URL đến trang user detail
-                                    selected={location.pathname.includes(user._id)}    // Highlight nếu đang ở trang user này
-                                    className="list-item-button"                       // CSS class cho padding right
+                                    component={Link}                                
+                                    to={`/users/${user._id}`}                        
+                                    selected={location.pathname.includes(user._id)}
+                                    className="list-item-button"                      
                                 >
                                     {/* Text hiển thị tên và location của user */}
                                     <ListItemText
-                                        primary={`${user.first_name} ${user.last_name}`}  // Tên chính
-                                        secondary={user.location}                          // Địa điểm (hiển thị mờ hơn)
+                                        primary={`${user.first_name} ${user.last_name}`}  
+                                        secondary={user.location}                         
                                     />
 
                                     {/* Container chứa các chips thống kê */}
@@ -177,25 +176,24 @@ function UserList() {
                                         {/* Chip hiển thị số lượng photos - màu xanh */}
                                         <Chip
                                             label={stats.photoCount}                   // Hiển thị số lượng photos
-                                            size="small"                               // Kích thước nhỏ
-                                            className="photo-chip"                     // CSS class cho styling
-                                            title={`${stats.photoCount} photos`}      // Tooltip khi hover
+                                            size="small"                               
+                                            className="photo-chip"                    
+                                            title={`${stats.photoCount} photos`}     
                                         />
 
                                         {/* Chip hiển thị số lượng comments - màu đỏ, có thể click */}
                                         <Chip
                                             label={stats.commentCount}                // Hiển thị số lượng comments
-                                            size="small"                               // Kích thước nhỏ
-                                            component={Link}                           // Sử dụng Link để navigate
-                                            to={`/comments/${user._id}`}               // URL đến trang comments của user
+                                            size="small"                              
+                                            component={Link}                          
+                                            to={`/comments/${user._id}`}              
                                             clickable                                  // Cho phép click
-                                            className="comment-chip"                   // CSS class cho styling
+                                            className="comment-chip"                   
                                             title={`${stats.commentCount} comments - Click to view`}  // Tooltip hướng dẫn
                                             onClick={(e) => {
-                                                // Xử lý click event: ngăn event bubbling và navigate thủ công
-                                                e.preventDefault();                    // Ngăn default link behavior
-                                                e.stopPropagation();                   // Ngăn event bubble up đến ListItemButton
-                                                window.location.href = `/comments/${user._id}`; // Navigate thủ công
+                                                e.preventDefault();                    
+                                                e.stopPropagation();                  
+                                                window.location.href = `/comments/${user._id}`; 
                                             }}
                                         />
                                     </Box>
