@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://thw6p3-8080.csb.app";
+const API_BASE_URL =  "http://localhost:8000";
 
 async function fetchModel(url) {
   try {

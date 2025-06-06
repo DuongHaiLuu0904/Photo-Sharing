@@ -15,10 +15,10 @@ const AdminRouter = require("./Back/routes/admin.route");
 dbConnect();
 
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? ['https://codesandbox.io', /https:\/\/.*\.csb\.app$/, /https:\/\/.*\.codesandbox\.io$/] 
-        : (process.env.FRONTEND_URL || 'http://localhost:3000'),
+    origin: 'http://localhost:3000',
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
 }));
 
 app.use(express.json());
@@ -35,9 +35,7 @@ app.get("/", (request, response) => {
     response.send({ message: "Hello from photo-sharing app API!" });
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`🚀 Server listening on port ${PORT}`);
-    console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔐 JWT Secret: ${process.env.JWT_SECRET ? 'Loaded from .env' : 'Using default (not secure for production)'}`);
+
+app.listen(8000, () => {
+    console.log(`🚀 Server listening on port ${8000}`);
 });
