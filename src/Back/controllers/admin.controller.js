@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const { generateToken } = require('../middlewares/authentication.middleware');
 
 module.exports.login = async (req, res) => {
     try {
@@ -30,13 +31,16 @@ module.exports.login = async (req, res) => {
             return res.status(400).json({ error: "Invalid login_name or password" });
         }
 
-        // Store user info in session
-        req.session.user = {
-            _id: user._id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            login_name: user.login_name
-        };
+        // Generate JWT token
+        const token = generateToken(user);
+        
+        // Set JWT token as HTTP-only cookie
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
 
         console.log('Login successful for:', user.login_name);
 
@@ -55,23 +59,24 @@ module.exports.login = async (req, res) => {
 }
 
 module.exports.logout = (req, res) => {
-    if (!req.session.user) {
-        return res.status(400).json({ error: "No user is currently logged in" });
-    }
-
-    req.session.destroy((err) => {
-        if (err) {
-            console.error("Logout error:", err);
-            return res.status(500).json({ error: "Failed to logout" });
-        }
-        res.clearCookie('connect.sid'); // Clear session cookie
-        res.json({ message: "Logged out successfully" });
+    // Clear JWT cookie
+    res.clearCookie('jwt', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
     });
+    res.json({ message: "Logged out successfully" });
 }
 
 module.exports.checkSession = (req, res) => {
-    if (req.session.user) {
-        res.json(req.session.user);
+    // User is available from JWT middleware
+    if (req.user) {
+        res.json({
+            _id: req.user.id,
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            login_name: req.user.login_name
+        });
     } else {
         res.status(401).json({ error: "No user logged in" });
     }

@@ -68,7 +68,7 @@ module.exports.photosOfUser = async (request, response) => {
 // POST /new  
 module.exports.uploadPhoto = async (request, response) => {
     try {
-        const userId = request.session.user._id;
+        const userId = request.user.id; 
         
         const userExists = await User.findById(userId);
         if (!userExists) {
@@ -114,7 +114,7 @@ module.exports.addComment = async (request, response) => {
     try {
         const photoId = request.params.photo_id;
         const { comment } = request.body;
-        const userId = request.session.user._id; // Lấy user từ session
+        const userId = request.user.id; // Use JWT user instead of session
 
         // Kiểm tra comment không được rỗng
         if (!comment || comment.trim() === '') {
@@ -173,7 +173,7 @@ module.exports.addComment = async (request, response) => {
 module.exports.deletePhoto = async (request, response) => {
     try {
         const photoId = request.params.photo_id;
-        const userId = request.session.user._id; // Lấy user từ session
+        const userId = request.user.id; // Use JWT user instead of session
 
         // Kiểm tra xem photo có tồn tại không
         const photo = await Photo.findById(photoId);
@@ -202,7 +202,7 @@ module.exports.deleteComment = async (request, response) => {
     try {
         const photoId = request.params.photo_id;
         const commentId = request.params.comment_id;
-        const userId = request.session.user._id; // Lấy user từ session
+        const userId = request.user.id; // Use JWT user instead of session
 
         // Kiểm tra xem photo có tồn tại không
         const photo = await Photo.findById(photoId);
@@ -233,7 +233,7 @@ module.exports.deleteComment = async (request, response) => {
 module.exports.likePhoto = async (request, response) => {
     try {
         const photoId = request.params.photo_id;
-        const userId = request.session.user._id;
+        const userId = request.user.id; // Use JWT user instead of session
 
         const photo = await Photo.findById(photoId);
         if (!photo) {
@@ -280,7 +280,7 @@ module.exports.likePhoto = async (request, response) => {
 module.exports.dislikePhoto = async (request, response) => {
     try {
         const photoId = request.params.photo_id;
-        const userId = request.session.user._id;
+        const userId = request.user.id; // Use JWT user instead of session
 
         const photo = await Photo.findById(photoId);
         if (!photo) {
