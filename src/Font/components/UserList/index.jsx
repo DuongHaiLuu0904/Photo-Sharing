@@ -22,24 +22,16 @@ import { useAppContext } from "../../contexts/AppContext";
  * Chỉ hiển thị khi user đã đăng nhập
  */
 function UserList() {
-    // Lấy trạng thái đăng nhập từ global context
     const { isLoggedIn } = useAppContext();
-    
-    // State quản lý dữ liệu và trạng thái component
-    const [users, setUsers] = useState([]);           // Danh sách tất cả users
+ 
+    const [users, setUsers] = useState([]);          
     const [userStats, setUserStats] = useState({});   // Thống kê cho từng user: {userId: {photoCount, commentCount}}
-    const [loading, setLoading] = useState(true);     // Trạng thái loading
-    const [error, setError] = useState(null);         // Lưu trữ error message nếu có
+    const [loading, setLoading] = useState(true);    
+    const [error, setError] = useState(null);        
     
-    // Hook để lấy thông tin về URL hiện tại (dùng để highlight user đang được chọn)
     const location = useLocation();
 
-    // useEffect: Load dữ liệu users và thống kê khi component mount hoặc trạng thái đăng nhập thay đổi
     useEffect(() => {
-        /**
-         * Hàm async để load dữ liệu users và tính toán thống kê
-         * Bao gồm số lượng photos và comments của từng user
-         */
         const loadUsersAndStats = async () => {
             // Nếu user chưa đăng nhập, dừng loading và không load dữ liệu
             if (!isLoggedIn) {
@@ -89,22 +81,18 @@ function UserList() {
                         });
                     });
 
-                    // Lưu thống kê vào object stats
                     stats[user._id] = {
                         photoCount,      // Số lượng photos của user
                         commentCount     // Số lượng comments user đã viết
                     };
                 });
 
-                // Cập nhật state với thống kê đã tính toán
                 setUserStats(stats);
-                setError(null);  // Clear error nếu thành công
+                setError(null); 
             } catch (err) {
-                // Xử lý lỗi: set error message và log lỗi
                 setError('Failed to load users');
                 console.error('Error loading users:', err);
             } finally {
-                // Luôn luôn tắt loading state dù thành công hay thất bại
                 setLoading(false);
             }
         };
@@ -183,13 +171,13 @@ function UserList() {
 
                                         {/* Chip hiển thị số lượng comments - màu đỏ, có thể click */}
                                         <Chip
-                                            label={stats.commentCount}                // Hiển thị số lượng comments
+                                            label={stats.commentCount}              
                                             size="small"                              
                                             component={Link}                          
                                             to={`/comments/${user._id}`}              
-                                            clickable                                  // Cho phép click
+                                            clickable                                  
                                             className="comment-chip"                   
-                                            title={`${stats.commentCount} comments - Click to view`}  // Tooltip hướng dẫn
+                                            title={`${stats.commentCount} comments - Click to view`} 
                                             onClick={(e) => {
                                                 e.preventDefault();                    
                                                 e.stopPropagation();                  

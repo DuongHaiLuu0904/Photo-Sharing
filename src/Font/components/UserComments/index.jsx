@@ -9,52 +9,29 @@ import {
     CircularProgress, 
     Grid,        
     CardMedia,   
-    Chip          
+    Chip,          
+    IconButton
 } from "@mui/material";
 
 import { Link, useParams } from "react-router-dom";
 
 import "./styles.css";
-import fetchModel from "../../lib/fetchModelData";
+import fetchModel, { deleteComment } from "../../lib/fetchModelData";
 import { useAppContext } from "../../contexts/AppContext";
+import { Delete } from "@mui/icons-material";
 
 
-/**
- * Component UserComments - Hiển thị tất cả comments của một user cụ thể
- * Component này cho phép xem danh sách tất cả comments mà một user đã viết
- * trên các photos khác nhau trong hệ thống
- */
 function UserComments() {
-    // Lấy userId từ URL parameters (ví dụ: /usercomments/123 -> userId = 123)
     const { userId } = useParams();
-    
-    // Lấy functions và state từ global context
     const { setCurrentContext, advancedFeaturesEnabled } = useAppContext();
-    
-    // State để lưu thông tin user hiện tại
     const [user, setUser] = useState(null);
-    
-    // State để lưu danh sách tất cả comments của user
     const [comments, setComments] = useState([]);
-    
-    // State để theo dõi trạng thái loading
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);    
     
-    // State để lưu thông báo lỗi (nếu có)
-    const [error, setError] = useState(null);    // useEffect hook chạy khi component mount và khi userId thay đổi
     useEffect(() => {
-        /**
-         * Function async để load tất cả comments của user
-         * Thực hiện các bước sau:
-         * 1. Load thông tin user
-         * 2. Load tất cả users trong hệ thống
-         * 3. Duyệt qua tất cả photos của mỗi user
-         * 4. Tìm comments được viết bởi userId đang xem
-         * 5. Gom tất cả comments lại và sort theo thời gian
-         */
         const loadUserComments = async () => {
             try {
-                // Bật trạng thái loading
                 setLoading(true);
 
                 // Bước 1: Load thông tin chi tiết của user hiện tại
@@ -113,30 +90,23 @@ function UserComments() {
                 allComments.sort((a, b) => new Date(b.date_time) - new Date(a.date_time));
                 setComments(allComments);
 
-                // Clear lỗi nếu load thành công
                 setError(null);
             } catch (err) {
-                // Xử lý lỗi và hiển thị thông báo
                 setError('Failed to load user comments');
                 console.error('Error loading user comments:', err);
             } finally {
-                // Luôn tắt loading khi hoàn thành (thành công hay thất bại)
                 setLoading(false);
             }
         };
 
-        // Chỉ load data khi có userId
         if (userId) {
             loadUserComments();
-        }        // Cleanup function: reset context khi component unmount
+        }        
+        // Cleanup function: reset context khi component unmount
         return () => setCurrentContext('');
     }, [userId, setCurrentContext]); // Dependencies: chạy lại khi userId hoặc setCurrentContext thay đổi
 
-    /**
-     * Function helper để format ngày giờ thành chuỗi dễ đọc
-     * @param {string} dateTimeString - Chuỗi ngày giờ từ database
-     * @returns {string} - Chuỗi ngày giờ đã được format
-     */
+   
     const formatDateTime = (dateTimeString) => {
         const date = new Date(dateTimeString);
         // Format theo định dạng: "Month Day, Year at Hour:Minute AM/PM"
@@ -150,19 +120,23 @@ function UserComments() {
         });
     };
 
-    /**
-     * Function helper để tạo link xem photo dựa trên cấu hình advanced features
-     * @param {Object} photo - Object chứa thông tin photo
-     * @returns {string} - URL để navigate đến photo
-     */
     const getPhotoViewLink = (photo) => {
-        // Nếu advanced features được bật, link đến photo cụ thể trong stepper view
         if (advancedFeaturesEnabled) {
             return `/photos/${photo.user_id}/${photo._id}`;
         }
-        // Ngược lại, chỉ link đến trang photos của user
         return `/photos/${photo.user_id}`;
-    };    // Render loading state - Hiển thị spinner khi đang load data
+    };    
+
+    const handleDeleteComment = async (photoId, commentId) => {
+        try {
+            await deleteComment(photoId, commentId);
+            setComments(prevComments => prevComments.filter(comment => comment._id !== commentId));
+            setError(null);
+        } catch (err) {
+            setError('Failed to delete comment'); 
+        }
+    };
+
     if (loading) {
         return (
             <Box className="loading-container">
@@ -171,7 +145,6 @@ function UserComments() {
         );
     }
     
-    // Render error state - Hiển thị lỗi khi không load được data hoặc không tìm thấy user
     if (error || !user) {
         return (
             <Typography variant="h6" color="error" className="error-message">
@@ -180,7 +153,6 @@ function UserComments() {
         );
     }
     
-    // Render empty state - Hiển thị thông báo khi user chưa có comment nào
     if (!comments || comments.length === 0) {
         return (
             <Box className="no-comments-container">
@@ -194,7 +166,6 @@ function UserComments() {
         );
     }
     
-    // Render main content - Hiển thị danh sách comments khi có data
     return (
         <Box className="main-container">
 
@@ -235,12 +206,24 @@ function UserComments() {
                                         <Typography variant="subtitle2" className="user-name">
                                             {user.first_name} {user.last_name}
                                         </Typography>
+
                                         <Chip
                                             label={formatDateTime(comment.date_time)}
                                             size="small"
                                             color="primary"
                                             variant="outlined"
                                         />
+
+                                        {/* <IconButton
+                                            className="delete-comment-button"
+                                            onClick={() => handleDeleteComment(comment.photo._id, comment._id)}
+                                            aria-label="delete comment"
+                                        >
+                                            <Delete />
+                                            <span className="delete-comment-text">
+                                                Delete
+                                            </span>
+                                        </IconButton> */}
                                     </Box>
 
                                     <Link

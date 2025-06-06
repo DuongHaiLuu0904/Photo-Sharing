@@ -71,3 +71,213 @@
 .upload-button {
     padding: 12px;
 }
+
+
+/* 
+import { useEffect, useState } from "react";
+import {
+    Box,          // Container component với flexbox
+    Card,         // Component card có shadow và border radius
+    CardContent,  // Nội dung bên trong card
+    Typography,   // Component hiển thị text với các variant khác nhau
+    Button,       // Component button với các style variants
+    Alert,        // Component hiển thị thông báo lỗi/thành công
+    CircularProgress, // Component loading spinner tròn
+    Paper         // Component có background và elevation
+} from "@mui/material";
+
+import { CloudUpload, PhotoCamera } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { uploadPhoto } from "../../lib/fetchModelData";
+import { useAppContext } from "../../contexts/AppContext";
+
+import "./style.css";
+
+function UploadPhoto() {
+    const navigate = useNavigate();
+    const { user, setCurrentContext } = useAppContext();
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState('');
+    const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [uploadedPhoto, setUploadedPhoto] = useState(null);   
+    
+    useEffect(() => {
+        setCurrentContext('Upload Photo');
+        return () => setCurrentContext('');
+    }, [setCurrentContext]);
+
+    const handleFileSelect = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            // Lưu file đã chọn vào state
+            setSelectedFile(file);
+            // Clear các state lỗi và thành công trước đó
+            setUploadError('');
+            setUploadSuccess(false);
+        }
+    };
+
+    
+    const handleUpload = async () => {
+        // Kiểm tra xem đã chọn file chưa
+        if (!selectedFile) {
+            setUploadError('Please select a file first');
+            return;
+        }
+
+        try {
+            // Bắt đầu quá trình upload
+            setUploading(true);
+            setUploadError('');
+
+            // Gọi API để upload photo
+            const result = await uploadPhoto(selectedFile);
+
+            // Upload thành công
+            setUploadSuccess(true);
+            setUploadedPhoto(result.photo);
+            setSelectedFile(null);
+
+            // Clear file input để user có thể chọn file khác
+            const fileInput = document.getElementById('photo-upload-input');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+
+        } catch (error) {
+            // Xử lý lỗi upload
+            console.error('Upload failed:', error);
+            setUploadError(error.message || 'Failed to upload photo');
+        } finally {
+            // Luôn tắt loading state khi hoàn thành
+            setUploading(false);
+        }
+    };
+
+   
+    const handleViewMyPhotos = () => {
+        navigate(`/photos/${user._id}`);
+    };
+
+    
+    const handleUploadAnother = () => {
+        setUploadSuccess(false);
+        setUploadedPhoto(null);
+        setUploadError('');
+    };    // Render main component
+    return (
+        <Box className="upload-photo-container">
+
+            <Typography variant="h4" gutterBottom className="upload-photo-title">
+                Upload New Photo
+            </Typography>
+
+            {uploadSuccess ? (
+
+                <Card className="success-card">
+                    <CardContent>
+
+                        <Typography variant="h6" color="success.main" gutterBottom className="success-title">
+                            ✅ Photo Uploaded Successfully!
+                        </Typography>
+
+                        {uploadedPhoto && (
+                            <Box className="success-content">
+ 
+                                <Typography variant="body1" gutterBottom className="success-description">
+                                    Your photo has been uploaded and is now available in your gallery.
+                                </Typography>
+
+                                <Box className="success-buttons">
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleViewMyPhotos}
+                                    >
+                                        View My Photos
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={handleUploadAnother}
+                                    >
+                                        Upload Another Photo
+                                    </Button>
+                                </Box>
+                            </Box>
+                        )}
+                    </CardContent>
+                </Card>
+            ) : (
+
+                <Card>
+                    <CardContent>
+
+                        {uploadError && (
+                            <Alert severity="error" className="upload-error">
+                                {uploadError}
+                            </Alert>
+                        )}
+
+                        <Box className="upload-icon-section">
+                            <PhotoCamera className="upload-icon" color="disabled" />
+                            <Typography variant="h6" gutterBottom className="upload-instructions">
+                                Select a photo to upload
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Supported formats: JPG, PNG, GIF (Max 10MB)
+                            </Typography>
+                        </Box>
+
+                        <Box className="file-input-section">
+
+                            <input
+                                id="photo-upload-input"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                className="file-input"
+                            />
+
+                            <label htmlFor="photo-upload-input">
+                                <Button
+                                    variant="outlined"
+                                    component="span"
+                                    fullWidth
+                                    className="choose-button"
+                                >
+                                    Choose Photo
+                                </Button>
+                            </label>
+
+                            {selectedFile && (
+                                <Paper className="file-info">
+                                    <Typography variant="body2">
+                                        <strong>Selected file:</strong> {selectedFile.name}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                                    </Typography>
+                                </Paper>
+                            )}
+                        </Box>
+
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            onClick={handleUpload}
+                            disabled={!selectedFile || uploading}
+                            startIcon={uploading ? <CircularProgress size={20} /> : <CloudUpload />}
+                            className="upload-button"
+                        >
+                            {uploading ? 'Uploading...' : 'Upload Photo'}
+                        </Button>
+                    </CardContent>
+                </Card>
+            )}
+        </Box>
+    );
+}
+
+export default UploadPhoto;
+
+*/

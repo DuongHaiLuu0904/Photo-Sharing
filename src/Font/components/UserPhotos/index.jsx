@@ -13,33 +13,24 @@ import {
     IconButton,       // Component button icon
     Button,           // Component button thường
     TextField,        // Component input text
-    Alert            // Component thông báo lỗi/cảnh báo
+    Alert,           // Component thông báo lỗi/cảnh báo
+    Icon
 } from "@mui/material";
 import {
     ArrowBackIos,     // Icon mũi tên quay lại
     ArrowForwardIos,  // Icon mũi tên tiến tới
-    ArrowBack,        // Icon back
-    Send              // Icon gửi
+    Send,              // Icon gửi
+    Delete,
+    ThumbUp as ThumbUpICon, // Icon like
+    ThumbDown as ThumbDownIcon // Icon dislike
 } from "@mui/icons-material";
-// Import React Router để điều hướng và lấy params từ URL
 import { Link, useParams, useNavigate } from "react-router-dom";
 
 import "./styles.css";
-import fetchModel, { addCommentToPhoto } from "../../lib/fetchModelData";
+import fetchModel, { addCommentToPhoto, deletePhoto, updateDislike, updateLike } from "../../lib/fetchModelData";
 import { useAppContext } from "../../contexts/AppContext";
 
-/**
- * Component con để hiển thị form thêm comment
- * @param {string} photoId - ID của ảnh cần comment
- * @param {Object} commentTexts - Object chứa text cho từng photo
- * @param {Function} setCommentTexts - Function để update comment texts
- * @param {Object} commentErrors - Object chứa errors cho từng photo
- * @param {Function} setCommentErrors - Function để update comment errors
- * @param {Object} commentLoading - Object chứa loading states
- * @param {Function} handleAddComment - Function để thêm comment
- * @param {boolean} isLoggedIn - Trạng thái đăng nhập
- * @param {Object} currentUser - Thông tin user hiện tại
- */
+
 const CommentForm = ({
     photoId,
     commentTexts,
@@ -56,9 +47,6 @@ const CommentForm = ({
     const currentError = commentErrors[photoId] || '';
     const isLoading = commentLoading[photoId] || false;
 
-    /**
-     * Xử lý thay đổi text trong textarea
-     */
     const handleTextChange = (e) => {
         setCommentTexts(prev => ({
             ...prev,
@@ -139,31 +127,25 @@ const CommentForm = ({
     );
 };
 
-/**
- * Component UserPhotos - Hiển thị danh sách ảnh của một user cụ thể
- * Hỗ trợ 2 chế độ xem: All Photos (hiển thị tất cả) và Single Photo Stepper (từng ảnh một)
- * Cho phép xem và thêm comment cho từng ảnh
- */
 function UserPhotos() {
-    // Lấy userId và photoId từ URL parameters thông qua React Router
     const { userId, photoId } = useParams();
-    // Hook để điều hướng trang
     const navigate = useNavigate();
-    // Lấy các giá trị từ global context
     const { setCurrentContext, advancedFeaturesEnabled, user: currentUser, isLoggedIn } = useAppContext();
 
-    // State chính để lưu trữ dữ liệu
-    const [user, setUser] = useState(null);              // Thông tin user sở hữu ảnh
-    const [photos, setPhotos] = useState([]);           // Danh sách ảnh của user
-    const [loading, setLoading] = useState(true);       // Trạng thái loading
-    const [error, setError] = useState(null);           // Lưu lỗi nếu có
-    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0); // Index ảnh hiện tại (dùng cho chế độ stepper)
+    const [user, setUser] = useState(null);
+    const [photos, setPhotos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
-    // Comment form states - quản lý state riêng biệt cho từng ảnh
-    // Sử dụng object với photoId làm key để tránh conflict giữa các form
-    const [commentTexts, setCommentTexts] = useState({});    // Text input cho từng photo: {photoId: text}
-    const [commentLoading, setCommentLoading] = useState({}); // Loading state cho từng photo: {photoId: boolean}
-    const [commentErrors, setCommentErrors] = useState({});   // Error message cho từng photo: {photoId: errorMessage}
+    const [like, setLike] = useState({});
+    const [dislike, setDislike] = useState({});
+    const [userLiked, setUserLiked] = useState({});
+    const [userDisliked, setUserDisliked] = useState({});
+
+    const [commentTexts, setCommentTexts] = useState({});
+    const [commentLoading, setCommentLoading] = useState({});
+    const [commentErrors, setCommentErrors] = useState({});
 
     // useEffect đầu tiên: Load dữ liệu user và photos khi component mount hoặc userId/photoId thay đổi
     useEffect(() => {
@@ -172,18 +154,15 @@ function UserPhotos() {
             try {
                 setLoading(true);
 
-                // Load user data và photos song song để tối ưu performance
                 const [userData, photosData] = await Promise.all([
-                    fetchModel(`/user/${userId}`),                    // API lấy thông tin user
-                    fetchModel(`/photo/photosOfUser/${userId}`)       // API lấy danh sách ảnh của user
+                    fetchModel(`/user/${userId}`),
+                    fetchModel(`/photo/photosOfUser/${userId}`)
                 ]);
 
-                // Cập nhật state với dữ liệu nhận được
                 setUser(userData);
                 setPhotos(photosData);
                 setError(null);
 
-                // Cập nhật context title hiển thị trên TopBar
                 if (userData) {
                     setCurrentContext(`Photos of ${userData.first_name} ${userData.last_name}`);
                 }
@@ -207,8 +186,6 @@ function UserPhotos() {
         if (userId) {
             loadUserAndPhotos();
         }
-
-        // Cleanup function: reset context khi component unmount
         return () => setCurrentContext('');
     }, [userId, photoId, setCurrentContext]);
 
@@ -217,18 +194,14 @@ function UserPhotos() {
         if (advancedFeaturesEnabled && photos.length > 0 && photos[currentPhotoIndex]) {
             const newPhotoId = photos[currentPhotoIndex]._id;
             const currentPath = `/photos/${userId}/${newPhotoId}`;
-            // Chỉ navigate nếu URL hiện tại khác với URL mong muốn
+
             if (window.location.pathname !== currentPath) {
-                navigate(currentPath, { replace: true }); // replace: true để không tạo history entry mới
+                navigate(currentPath, { replace: true });
             }
         }
     }, [currentPhotoIndex, photos, userId, navigate, advancedFeaturesEnabled]);
 
-    /**
-     * Hàm format thời gian từ string thành dạng dễ đọc
-     * @param {string} dateTimeString - Chuỗi thời gian từ database
-     * @returns {string} Thời gian đã format theo locale US
-     */
+
     const formatDateTime = (dateTimeString) => {
         const date = new Date(dateTimeString);
         return date.toLocaleString('en-US', {
@@ -241,42 +214,22 @@ function UserPhotos() {
         });
     };
 
-    /**
-     * Xử lý chuyển đến ảnh trước đó (chế độ advanced)
-     * Sử dụng useCallback để tối ưu performance, tránh re-render không cần thiết
-     */
     const handlePreviousPhoto = useCallback(() => {
         if (currentPhotoIndex > 0) {
             setCurrentPhotoIndex(currentPhotoIndex - 1);
         }
     }, [currentPhotoIndex]);
 
-    /**
-     * Xử lý chuyển đến ảnh tiếp theo (chế độ advanced)
-     * Sử dụng useCallback để tối ưu performance
-     */
+
     const handleNextPhoto = useCallback(() => {
         if (currentPhotoIndex < photos.length - 1) {
             setCurrentPhotoIndex(currentPhotoIndex + 1);
         }
     }, [currentPhotoIndex, photos.length]);
 
-    /**
-     * Xử lý quay lại trang hiển thị tất cả ảnh
-     */
-    const handleBackToAllPhotos = () => {
-        navigate(`/photos/${userId}`);
-    };
-
-    /**
-     * Xử lý thêm comment mới cho một ảnh cụ thể
-     * @param {string} photoIdToComment - ID của ảnh cần thêm comment
-     */
     const handleAddComment = async (photoIdToComment) => {
-        // Lấy text comment hiện tại cho ảnh này
         const currentText = commentTexts[photoIdToComment] || '';
 
-        // Validation: Kiểm tra comment không rỗng
         if (!currentText.trim()) {
             setCommentErrors(prev => ({
                 ...prev,
@@ -285,7 +238,6 @@ function UserPhotos() {
             return;
         }
 
-        // Validation: Kiểm tra user đã đăng nhập
         if (!isLoggedIn || !currentUser) {
             setCommentErrors(prev => ({
                 ...prev,
@@ -295,12 +247,11 @@ function UserPhotos() {
         }
 
         try {
-            // Set loading state cho photo này
             setCommentLoading(prev => ({
                 ...prev,
                 [photoIdToComment]: true
             }));
-            // Clear error cũ
+
             setCommentErrors(prev => ({
                 ...prev,
                 [photoIdToComment]: ''
@@ -315,7 +266,7 @@ function UserPhotos() {
                     if (photo._id === photoIdToComment) {
                         return {
                             ...photo,
-                            comments: [...photo.comments, newComment] // Thêm comment mới vào cuối array
+                            comments: [...photo.comments, newComment]
                         };
                     }
                     return photo;
@@ -329,13 +280,11 @@ function UserPhotos() {
             }));
         } catch (error) {
             console.error('Error adding comment:', error);
-            // Set error message nếu có lỗi
             setCommentErrors(prev => ({
                 ...prev,
                 [photoIdToComment]: error.message || 'Failed to add comment'
             }));
         } finally {
-            // Tắt loading state
             setCommentLoading(prev => ({
                 ...prev,
                 [photoIdToComment]: false
@@ -345,25 +294,17 @@ function UserPhotos() {
 
     // useEffect thứ ba: Thêm hỗ trợ điều khiển bàn phím cho chế độ advanced
     useEffect(() => {
-        // Chỉ hoạt động trong chế độ advanced
         if (!advancedFeaturesEnabled) return;
 
-        /**
-         * Xử lý sự kiện nhấn phím
-         * @param {KeyboardEvent} event - Sự kiện keyboard
-         */
         const handleKeyPress = (event) => {
-            // Mũi tên trái: chuyển về ảnh trước
             if (event.key === 'ArrowLeft' && currentPhotoIndex > 0) {
                 handlePreviousPhoto();
             }
-            // Mũi tên phải: chuyển đến ảnh tiếp theo
             else if (event.key === 'ArrowRight' && currentPhotoIndex < photos.length - 1) {
                 handleNextPhoto();
             }
         };
 
-        // Đăng ký event listener
         window.addEventListener('keydown', handleKeyPress);
 
         // Cleanup: Hủy đăng ký event listener khi component unmount hoặc dependencies thay đổi
@@ -372,7 +313,99 @@ function UserPhotos() {
         };
     }, [advancedFeaturesEnabled, currentPhotoIndex, photos.length, handlePreviousPhoto, handleNextPhoto]);
 
-    // Hiển thị loading spinner khi đang load dữ liệu
+    const handleDeletePhoto = async (photoIdToDelete) => {
+        if (!isLoggedIn || !currentUser) {
+            setError('You must be logged in to delete a photo');
+            return;
+        }
+        try {
+            await deletePhoto(photoIdToDelete);
+            setPhotos(prevPhotos => prevPhotos.filter(photo => photo._id !== photoIdToDelete));
+            setCurrentPhotoIndex(0); // Reset index after deletion
+            setError(null);
+        } catch (err) {
+            console.error('Error deleting photo:', err);
+            setError('Failed to delete photo');
+        }
+    };   
+    
+    // useEffect thứ tư: Đồng bộ hóa like/dislike và userLiked/userDisliked với dữ liệu từ server
+    useEffect(() => {
+        if (photos && photos.length > 0) {
+            const likesObj = {};
+            const dislikesObj = {};
+            const userLikedObj = {};
+            const userDislikedObj = {};
+            
+            photos.forEach(photo => {
+                likesObj[photo._id] = photo.like || 0;
+                dislikesObj[photo._id] = photo.dislike || 0;
+                
+                // Kiểm tra user hiện tại đã like/dislike chưa
+                if (currentUser) {
+                    userLikedObj[photo._id] = photo.userLiked && photo.userLiked.includes(currentUser._id);
+                    userDislikedObj[photo._id] = photo.userDisliked && photo.userDisliked.includes(currentUser._id);
+                }
+            });
+            
+            setLike(likesObj);
+            setDislike(dislikesObj);
+            setUserLiked(userLikedObj);
+            setUserDisliked(userDislikedObj);
+        }
+    }, [photos, currentUser]);
+
+    const handleLike = async (photoId) => {
+        if (!isLoggedIn) return;
+        try {
+            const res = await updateLike(photoId);
+            setLike(prev => ({
+                ...prev,
+                [photoId]: res.like
+            }));
+            setDislike(prev => ({
+                ...prev,
+                [photoId]: res.dislike
+            }));
+            setUserLiked(prev => ({
+                ...prev,
+                [photoId]: res.userLiked.includes(currentUser._id)
+            }));
+            setUserDisliked(prev => ({
+                ...prev,
+                [photoId]: res.userDisliked.includes(currentUser._id)
+            }));
+        } catch (error) {
+            console.error('Update like failed:', error);
+        }
+    };
+
+    // Xử lý Dislike
+    const handleDislike = async (photoId) => {
+        if (!isLoggedIn) return;
+        try {
+            const res = await updateDislike(photoId);
+            setLike(prev => ({
+                ...prev,
+                [photoId]: res.like
+            }));
+            setDislike(prev => ({
+                ...prev,
+                [photoId]: res.dislike
+            }));
+            setUserLiked(prev => ({
+                ...prev,
+                [photoId]: res.userLiked.includes(currentUser._id)
+            }));
+            setUserDisliked(prev => ({
+                ...prev,
+                [photoId]: res.userDisliked.includes(currentUser._id)
+            }));
+        } catch (error) {
+            console.error('Update dislike failed:', error);
+        }
+    };
+
     if (loading) {
         return (
             <Box className="loading-container">
@@ -381,7 +414,6 @@ function UserPhotos() {
         );
     }
 
-    // Hiển thị thông báo lỗi nếu có lỗi hoặc không tìm thấy user
     if (error || !user) {
         return (
             <Typography variant="h6" color="error" className="error-container">
@@ -390,7 +422,6 @@ function UserPhotos() {
         );
     }
 
-    // Hiển thị thông báo khi user không có ảnh nào
     if (!photos || photos.length === 0) {
         return (
             <Box className="user-photos-container">
@@ -404,7 +435,6 @@ function UserPhotos() {
         );
     }
 
-    // Advanced Features: Single Photo Stepper View - Chế độ xem từng ảnh một
     if (advancedFeaturesEnabled) {
         const currentPhoto = photos[currentPhotoIndex];
         const isFirstPhoto = currentPhotoIndex === 0;
@@ -412,15 +442,9 @@ function UserPhotos() {
 
         return (
             <Box className="user-photos-container">
-                {/* Header với back button và thông tin navigation */}
+
                 <Box className="advanced-header">
-                    <Button
-                        startIcon={<ArrowBack />}
-                        onClick={handleBackToAllPhotos}
-                        className="back-button"
-                    >
-                        Back to All Photos
-                    </Button>
+
                     <Typography variant="h5" className="title">
                         {user.first_name} {user.last_name}'s Photos
                     </Typography>
@@ -439,11 +463,6 @@ function UserPhotos() {
                         <ArrowBackIos />
                     </IconButton>
 
-                    <Box className="nav-info">
-                        <Typography variant="body2" color="text.secondary">
-                            Use arrow buttons or browser back/forward to navigate
-                        </Typography>
-                    </Box>
 
                     <IconButton
                         onClick={handleNextPhoto}
@@ -454,61 +473,90 @@ function UserPhotos() {
                     </IconButton>
                 </Box>
 
-                {/* Current photo display - Hiển thị ảnh hiện tại trong chế độ advanced */}
                 <Card>
-                    {/* CardMedia: Component hiển thị ảnh chính */}
                     <CardMedia
-                        component="img"                              
-                        image={currentPhoto.file_name}               
-                        alt={`Photo by ${user.first_name} ${user.last_name}`}  
+                        component="img"
+                        image={currentPhoto.file_name}
+                        alt={`Photo by ${user.first_name} ${user.last_name}`}
                         className="photo-media"
                     />
-                    <CardContent>
-                        {/* Hiển thị thời gian chụp ảnh dưới dạng chip */}
+                    <CardContent>                        
+                        {/* <Box display="flex" alignItems="center" gap={1}>
+                            <IconButton
+                                color={userLiked[currentPhoto._id] ? "primary" : "default"}
+                                onClick={() => handleLike(currentPhoto._id)}
+                                disabled={!isLoggedIn}
+                                title="Like Photo"
+                            >
+                                <ThumbUpICon />
+                            </IconButton>
+                            <Typography variant="body2">{like[currentPhoto._id] !== undefined ? like[currentPhoto._id] : currentPhoto.like || 0}</Typography>
+                            <IconButton
+                                color={userDisliked[currentPhoto._id] ? "error" : "default"}
+                                onClick={() => handleDislike(currentPhoto._id)}
+                                disabled={!isLoggedIn}
+                                aria-label="Dislike"
+                            >
+                                <ThumbDownIcon />
+                            </IconButton>
+                            <Typography variant="body2">{dislike[currentPhoto._id] !== undefined ? dislike[currentPhoto._id] : currentPhoto.dislike || 0}</Typography>
+                        </Box> */}
+
                         <Box className="photo-info">
                             <Chip
-                                label={formatDateTime(currentPhoto.date_time)}  
-                                size="small"                                     
-                                color="primary"                                 
-                                variant="outlined"                               
+                                label={formatDateTime(currentPhoto.date_time)}
+                                size="small"
+                                color="primary"
+                                variant="outlined"
                             />
                         </Box>
+                        {/* {isLoggedIn && currentUser && currentUser._id === user._id && (
+                            <IconButton
+                                className="delete-button"
+                                onClick={() => handleDeletePhoto(currentPhoto._id)}
+                                disabled={commentLoading[currentPhoto._id]}
+                                title="Delete Photo"
+                                aria-label="Delete Photo"
+                                color="error"
+                            >
+                                <Delete />
+                                <span className="visually-hidden">Delete Photo</span>
+                            </IconButton>
+                        )} */}
 
-                        {/* Section hiển thị danh sách comments - chỉ hiển thị khi có comment */}
                         {currentPhoto.comments && currentPhoto.comments.length > 0 && (
                             <Box className="comments-section">
-                                {/* Header của section comments với số lượng */}
+
                                 <Typography variant="h6" gutterBottom>
                                     Comments ({currentPhoto.comments.length})
                                 </Typography>
 
-                                {/* Map qua từng comment để hiển thị */}
                                 {currentPhoto.comments.map((comment, index) => (
                                     <Box key={comment._id} className="comment-item">
                                         <Paper elevation={1} className="comment-paper">
                                             <Box className="comment-header">
-                                                {/* Avatar hiển thị chữ cái đầu của họ tên */}
+
                                                 <Avatar className="comment-avatar">
                                                     {comment.user.first_name[0]}{comment.user.last_name[0]}
                                                 </Avatar>
-                                                {/* Container cho thông tin user */}
+
                                                 <Box className="comment-user-info">
-                                                    {/* Tên user - clickable link đến trang user */}
+
                                                     <Typography
                                                         variant="subtitle2"
-                                                        component={Link}        
-                                                        to={`/users/${comment.user._id}`} 
+                                                        component={Link}
+                                                        to={`/users/${comment.user._id}`}
                                                         className="comment-user-link"
                                                     >
                                                         {comment.user.first_name} {comment.user.last_name}
                                                     </Typography>
-                                                    {/* Thời gian comment - hiển thị nhỏ và mờ */}
+
                                                     <Typography variant="caption" color="text.secondary">
                                                         {formatDateTime(comment.date_time)}
                                                     </Typography>
                                                 </Box>
                                             </Box>
-                                            {/* Nội dung comment */}
+
                                             <Typography variant="body2">
                                                 {comment.comment}
                                             </Typography>
@@ -518,8 +566,8 @@ function UserPhotos() {
                                     </Box>
                                 ))}
                             </Box>
-                        )}                        
-                        {/* Form thêm comment mới - sử dụng component con CommentForm */}
+                        )}
+
                         <CommentForm
                             photoId={currentPhoto._id}
                             commentTexts={commentTexts}
@@ -537,72 +585,98 @@ function UserPhotos() {
         );
     }
 
-    // Normal Mode: All Photos View - Chế độ hiển thị tất cả ảnh (chế độ mặc định)
     return (
         <Box className="user-photos-container">
-            {/* Title hiển thị tên user */}
+
             <Typography variant="h5" gutterBottom>
                 {user.first_name} {user.last_name}'s Photos
             </Typography>
 
-            {/* Map qua tất cả photos để hiển thị dưới dạng danh sách dọc */}
             {photos.map((photo) => (
-                <Card key={photo._id} className="photo-card">        {/* Mỗi ảnh trong một Card riêng với margin bottom */}
-                    {/* CardMedia: Hiển thị ảnh chính */}
+                <Card key={photo._id} className="photo-card">
+
                     <CardMedia
-                        component="img"                              
-                        image={photo.file_name}                    
-                        alt={`Photo by ${user.first_name} ${user.last_name}`} 
-                        className="photo-media"
-                    />
-                    {/* CardContent: Chứa thông tin và comments của ảnh */}
+                        component="img"
+                        image={photo.file_name}
+                        alt={`Photo by ${user.first_name} ${user.last_name}`}
+                        className="photo-media"                    />     
+
+                    {/* <Box display="flex" alignItems="center" gap={1}>
+                        <IconButton
+                            color={userLiked[photo._id] ? "primary" : "default"}
+                            onClick={() => handleLike(photo._id)}
+                            disabled={!isLoggedIn}
+                            title="Like Photo"
+                        >
+                            <ThumbUpICon />
+                        </IconButton>
+                        <Typography variant="body2">{like[photo._id] !== undefined ? like[photo._id] : photo.like || 0}</Typography>
+                        <IconButton
+                            color={userDisliked[photo._id] ? "error" : "default"}
+                            onClick={() => handleDislike(photo._id)}
+                            disabled={!isLoggedIn}
+                            aria-label="Dislike"
+                        >
+                            <ThumbDownIcon />
+                        </IconButton>
+                        <Typography variant="body2">{dislike[photo._id] !== undefined ? dislike[photo._id] : photo.dislike || 0}</Typography>
+                    </Box> */}
+
                     <CardContent>
-                        {/* Box chứa chip thời gian */}
                         <Box className="photo-info">
                             <Chip
-                                label={formatDateTime(photo.date_time)}     
-                                size="small"                               
-                                color="primary"                             
-                                variant="outlined"                         
+                                label={formatDateTime(photo.date_time)}
+                                size="small"
+                                color="primary"
+                                variant="outlined"
                             />
                         </Box>
 
-                        {/* Section comments - chỉ hiển thị khi ảnh có comments */}
+                        {/* {isLoggedIn && currentUser && currentUser._id === user._id && (
+                            <IconButton
+                                className="delete-button"
+                                onClick={() => handleDeletePhoto(photo._id)}
+                                disabled={commentLoading[photo._id]}
+                                title="Delete Photo"
+                                aria-label="Delete Photo"
+                                color="error"
+                            >
+                                <Delete />
+                                <span className="visually-hidden">Delete Photo</span>
+                            </IconButton>
+                        )} */}
+
                         {photo.comments && photo.comments.length > 0 && (
                             <Box className="comments-section">
-                                {/* Header section comments với số lượng */}
                                 <Typography variant="h6" gutterBottom>
                                     Comments ({photo.comments.length})
                                 </Typography>
 
-                                {/* Render từng comment */}
                                 {photo.comments.map((comment, index) => (
-                                    <Box key={comment._id} className="comment-item">         
+                                    <Box key={comment._id} className="comment-item">
                                         <Paper elevation={1} className="comment-paper">
                                             <Box className="comment-header">
-                                                {/* Avatar tròn với chữ cái đầu họ tên */}
+
                                                 <Avatar className="comment-avatar">
                                                     {comment.user.first_name[0]}{comment.user.last_name[0]}
                                                 </Avatar>
-                                                {/* Container cho thông tin user (tên + thời gian) */}
+
                                                 <Box className="comment-user-info">
-                                                    {/* Tên user - là link điều hướng đến trang user */}
                                                     <Typography
-                                                        variant="subtitle2"          // Font weight đậm, size vừa
-                                                        component={Link}            
-                                                        to={`/users/${comment.user._id}`}  
+                                                        variant="subtitle2"
+                                                        component={Link}
+                                                        to={`/users/${comment.user._id}`}
                                                         className="comment-user-link"
                                                     >
                                                         {comment.user.first_name} {comment.user.last_name}
                                                     </Typography>
-                                                    {/* Thời gian comment - hiển thị nhỏ và mờ */}
+
                                                     <Typography variant="caption" color="text.secondary">
                                                         {formatDateTime(comment.date_time)}
                                                     </Typography>
                                                 </Box>
                                             </Box>
-                                            
-                                            {/* Nội dung chính của comment */}
+
                                             <Typography variant="body2">
                                                 {comment.comment}
                                             </Typography>
@@ -613,7 +687,7 @@ function UserPhotos() {
                                 ))}
                             </Box>
                         )}
-                        {/* Form thêm comment mới - sử dụng component con đã định nghĩa ở trên */}
+
                         <CommentForm
                             photoId={photo._id}
                             commentTexts={commentTexts}

@@ -114,3 +114,268 @@
     margin-top: 8px !important;
     display: block !important;
 }
+
+
+/* 
+import { useEffect, useState } from "react";
+import {
+    Typography,   
+    Card,        
+    CardContent,  
+    Box,        
+    Avatar,       
+    Paper,       
+    CircularProgress, 
+    Grid,        
+    CardMedia,   
+    Chip,          
+    IconButton
+} from "@mui/material";
+
+import { Link, useParams } from "react-router-dom";
+
+import "./styles.css";
+import fetchModel, { deleteComment } from "../../lib/fetchModelData";
+import { useAppContext } from "../../contexts/AppContext";
+import { Delete } from "@mui/icons-material";
+
+
+function UserComments() {
+    const { userId } = useParams();
+    const { setCurrentContext, advancedFeaturesEnabled } = useAppContext();
+    const [user, setUser] = useState(null);
+    const [comments, setComments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);    
+    
+    useEffect(() => {
+        const loadUserComments = async () => {
+            try {
+                setLoading(true);
+
+                // Bước 1: Load thông tin chi tiết của user hiện tại
+                const userData = await fetchModel(`/user/${userId}`);
+                setUser(userData);
+
+                // Nếu load user thành công, cập nhật context title
+                if (userData) {
+                    setCurrentContext(`Comments by ${userData.first_name} ${userData.last_name}`);
+                }
+
+                // Bước 2: Load danh sách tất cả users trong hệ thống
+                const allUsers = await fetchModel('/user/list');
+                const allComments = [];
+
+                // Bước 3 & 4: Duyệt qua từng user để tìm comments của userId
+                // Vì comments được lưu trong từng photo, ta phải duyệt tất cả photos
+                for (const user of allUsers) {
+                    try {
+                        // Load tất cả photos của user này
+                        const userPhotos = await fetchModel(`/photo/photosOfUser/${user._id}`);
+                        
+                        // Nếu user có photos
+                        if (userPhotos && userPhotos.length > 0) {
+                            // Duyệt qua từng photo
+                            userPhotos.forEach(photo => {
+                                // Nếu photo có comments
+                                if (photo.comments && photo.comments.length > 0) {
+                                    // Duyệt qua từng comment trong photo
+                                    photo.comments.forEach(comment => {
+                                        // Nếu comment được viết bởi userId đang tìm
+                                        if (comment.user._id === userId) {
+                                            // Thêm comment vào danh sách kết quả
+                                            // Bao gồm cả thông tin photo để hiển thị thumbnail
+                                            allComments.push({
+                                                ...comment,
+                                                photo: {
+                                                    _id: photo._id,
+                                                    file_name: photo.file_name,
+                                                    date_time: photo.date_time,
+                                                    user_id: photo.user_id
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    } catch (err) {
+                        // Log lỗi nhưng tiếp tục với user tiếp theo
+                        console.error(`Error loading photos for user ${user._id}:`, err);
+                    }
+                }
+
+                // Bước 5: Sắp xếp comments theo thời gian (mới nhất trước)
+                allComments.sort((a, b) => new Date(b.date_time) - new Date(a.date_time));
+                setComments(allComments);
+
+                setError(null);
+            } catch (err) {
+                setError('Failed to load user comments');
+                console.error('Error loading user comments:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (userId) {
+            loadUserComments();
+        }        
+        // Cleanup function: reset context khi component unmount
+        return () => setCurrentContext('');
+    }, [userId, setCurrentContext]); // Dependencies: chạy lại khi userId hoặc setCurrentContext thay đổi
+
+   
+    const formatDateTime = (dateTimeString) => {
+        const date = new Date(dateTimeString);
+        // Format theo định dạng: "Month Day, Year at Hour:Minute AM/PM"
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    };
+
+    const getPhotoViewLink = (photo) => {
+        if (advancedFeaturesEnabled) {
+            return `/photos/${photo.user_id}/${photo._id}`;
+        }
+        return `/photos/${photo.user_id}`;
+    };    
+
+    const handleDeleteComment = async (photoId, commentId) => {
+        try {
+            await deleteComment(photoId, commentId);
+            setComments(prevComments => prevComments.filter(comment => comment._id !== commentId));
+            setError(null);
+        } catch (err) {
+            setError('Failed to delete comment'); 
+        }
+    };
+
+    if (loading) {
+        return (
+            <Box className="loading-container">
+                <CircularProgress />
+            </Box>
+        );
+    }
+    
+    if (error || !user) {
+        return (
+            <Typography variant="h6" color="error" className="error-message">
+                {error || 'User not found'}
+            </Typography>
+        );
+    }
+    
+    if (!comments || comments.length === 0) {
+        return (
+            <Box className="no-comments-container">
+                <Typography variant="h5" gutterBottom>
+                    Comments by {user.first_name} {user.last_name}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                    This user hasn't made any comments yet.
+                </Typography>
+            </Box>
+        );
+    }
+    
+    return (
+        <Box className="main-container">
+
+            <Typography variant="h5" gutterBottom>
+                Comments by {user.first_name} {user.last_name}
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary" className="comments-count">
+                Total comments: {comments.length}
+            </Typography>
+        
+            {comments.map((comment) => (
+                <Card key={`${comment.photo._id}-${comment._id}`} className="individual-comment-card">
+                    <CardContent>
+                        <Grid container spacing={2}>
+                     
+                            <Grid item xs={12} sm={3}>
+                                <Link
+                                    to={getPhotoViewLink(comment.photo)}
+                                    style={{ textDecoration: 'none' }}
+                                >
+                                    <CardMedia
+                                        component="img"
+                                        image={comment.photo.file_name}
+                                        alt="Photo thumbnail"
+                                        className="photo-thumbnail"
+                                    />
+                                </Link>
+                            </Grid>
+
+                         
+                            <Grid item xs={12} sm={9}>
+                                <Box>
+                                    <Box className="comment-header">
+                                        <Avatar className="user-avatar">
+                                            {user.first_name[0]}{user.last_name[0]}
+                                        </Avatar>
+                                        <Typography variant="subtitle2" className="user-name">
+                                            {user.first_name} {user.last_name}
+                                        </Typography>
+
+                                        <Chip
+                                            label={formatDateTime(comment.date_time)}
+                                            size="small"
+                                            color="primary"
+                                            variant="outlined"
+                                        />
+
+                                        <IconButton
+                                            className="delete-comment-button"
+                                            onClick={() => handleDeleteComment(comment.photo._id, comment._id)}
+                                            aria-label="delete comment"
+                                        >
+                                            <Delete />
+                                            <span className="delete-comment-text">
+                                                Delete
+                                            </span>
+                                        </IconButton> 
+                                    </Box>
+
+                                    <Link
+                                        to={getPhotoViewLink(comment.photo)}
+                                        style={{ textDecoration: 'none' }}
+                                    >
+                                        <Paper
+                                            elevation={1}
+                                            className="comment-paper"
+                                        >
+                                            <Typography variant="body1">
+                                                {comment.comment}
+                                            </Typography>
+                                        </Paper>
+                                    </Link>
+                                    
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        className="view-photo-hint"
+                                    >
+                                        Click to view photo and all comments
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                </Card>
+            ))}
+        </Box>
+    );
+}
+
+export default UserComments;
+
+*/

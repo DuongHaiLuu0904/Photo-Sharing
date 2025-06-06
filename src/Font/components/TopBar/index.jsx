@@ -19,41 +19,29 @@ import "./styles.css";
 
 function TopBar() {
     const {
-        currentContext,              // Context hiện tại được set bởi các components
-        advancedFeaturesEnabled,     // Trạng thái advanced features
-        setAdvancedFeaturesEnabled,  // Function để toggle advanced features
-        user,                        // Thông tin user hiện tại
-        isLoggedIn,                  // Trạng thái đăng nhập
-        setUser,                     // Function để set user
-        setIsLoggedIn                // Function để set trạng thái đăng nhập
+        currentContext,              
+        advancedFeaturesEnabled,    
+        setAdvancedFeaturesEnabled, 
+        user,                       
+        isLoggedIn,                
+        setUser,                    
+        setIsLoggedIn               
     } = useAppContext();
-    
-    // Hook để lấy thông tin location hiện tại
     const location = useLocation();
-    
-    // Hook để navigate programmatically
     const navigate = useNavigate();
-    
-    // State để lưu context fallback khi currentContext chưa được set
     const [fallbackContext, setFallbackContext] = useState('');
 
     // useEffect để kiểm tra session khi component mount
     useEffect(() => {
-        /**
-         * Function để kiểm tra xem user đã đăng nhập chưa
-         * Gọi API để validate session hiện tại
-         */
         const checkSession = async () => {
             try {
                 // Gọi API để kiểm tra session
                 const userData = await authCheckSession();
                 if (userData && userData.login_name) {
-                    // Nếu có session hợp lệ, set user state
                     setUser(userData);
                     setIsLoggedIn(true);
                 }
             } catch (error) {
-                // Không có session active, điều này bình thường
                 console.log('No active session');
             }
         };
@@ -61,15 +49,7 @@ function TopBar() {
         checkSession();
     }, [setUser, setIsLoggedIn]);
 
-    // useEffect để load fallback context dựa trên URL
     useEffect(() => {
-        /**
-         * Function để load context fallback khi components chưa set context
-         * Parse URL để xác định context phù hợp:
-         * - /users/:id -> Tên user
-         * - /comments/:id -> "Comments by [User Name]"
-         * - /photos/:userId/:photoId? -> "Photos of [User Name]" hoặc "Photo X of Y"
-         */
         const loadFallbackContext = async () => {
             const path = location.pathname;
             
@@ -129,47 +109,29 @@ function TopBar() {
             }
         };
 
-        // Chỉ load fallback context khi:
-        // 1. Không có currentContext từ components
-        // 2. User đã đăng nhập
         if (!currentContext && isLoggedIn) {
             loadFallbackContext();
         }
     }, [location.pathname, currentContext, isLoggedIn]);
 
-    // Chọn context để hiển thị: currentContext có priority cao hơn fallbackContext
     const displayContext = currentContext || fallbackContext;
 
-    /**
-     * Handler function để toggle advanced features
-     * @param {Event} event - Event từ checkbox
-     */
     const handleAdvancedFeaturesToggle = (event) => {
         setAdvancedFeaturesEnabled(event.target.checked);
     };
 
-    /**
-     * Handler function để logout user
-     * Gọi API logout và clear user state
-     */
     const handleLogout = async () => {
         try {
-            // Gọi API để logout trên server
             await authLogout();
-            // Clear user state
             setUser(null);
             setIsLoggedIn(false);
         } catch (error) {
             console.error('Logout failed:', error);
-            // Vẫn clear user state ngay cả khi API call thất bại
             setUser(null);
             setIsLoggedIn(false);
         }
     };
 
-    /**
-     * Handler function để navigate đến trang upload photo
-     */
     const handleAddPhoto = () => {
         navigate('/upload-photo');
     };
@@ -183,7 +145,6 @@ function TopBar() {
                     Photo Sharing App
                 </Typography>
 
-                {/* Advanced Features checkbox - Chỉ hiển thị khi đã đăng nhập */}
                 {isLoggedIn && (
                     <FormControlLabel
                         control={
@@ -213,13 +174,13 @@ function TopBar() {
                             Hello {user?.first_name}
                         </Typography>
 
-                        <Button
+                        {/* <Button
                             color="inherit"
                             onClick={() => navigate(`/user/edit/${user._id}`)}
                             className="edit-button"
                         >
                             Edit 
-                        </Button>
+                        </Button> */}
                         
                         <Button
                             color="inherit"
